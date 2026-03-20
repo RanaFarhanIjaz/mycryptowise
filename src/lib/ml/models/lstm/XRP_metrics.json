@@ -1,0 +1,33 @@
+{
+  "symbol": "XRP",
+  "model": "lstm",
+  "mse": 0.0014738958493235753,
+  "mae": 0.026279588629746067,
+  "r2": -0.001435633228077382,
+  "direction_accuracy": 0.5605536332179931,
+  "train_samples": 1155,
+  "test_samples": 289,
+  "features": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "sma_7",
+    "sma_25",
+    "ema_12",
+    "ema_26",
+    "rsi",
+    "macd",
+    "bb_position",
+    "atr_percent",
+    "volume_ratio",
+    "price_range",
+    "volatility",
+    "momentum_1d",
+    "momentum_5d",
+    "dist_to_resistance",
+    "dist_to_support"
+  ],
+  "timestamp": "2026-03-02T00:59:14.640513"
+}
