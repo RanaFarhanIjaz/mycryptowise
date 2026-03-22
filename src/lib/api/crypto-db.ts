@@ -45,9 +45,9 @@ export const cryptoDatabase: Record<string, CryptoInfo> = {
     consensus: 'Proof of History (PoH) + Proof of Stake (PoS)',
     maxSupply: 'No max supply (inflationary)',
     circulatingSupply: '~450 million SOL',
-    marketCap: '~ billion',
-    allTimeHigh: '',
-    allTimeLow: '.50',
+    marketCap: '~$45 billion',
+    allTimeHigh: '$260',
+    allTimeLow: '$0.50',
     useCases: [
       'DeFi applications',
       'NFT marketplaces',
@@ -58,7 +58,7 @@ export const cryptoDatabase: Record<string, CryptoInfo> = {
     features: [
       '50,000+ TPS (transactions per second)',
       'Sub-second finality',
-      'Low transaction fees (<.01)',
+      'Low transaction fees (<$0.01)',
       'EVM compatibility via Neon',
       'Energy efficient'
     ],
@@ -113,9 +113,9 @@ export const cryptoDatabase: Record<string, CryptoInfo> = {
     consensus: 'Proof of Work (PoW)',
     maxSupply: '21 million BTC',
     circulatingSupply: '~19.5 million BTC',
-    marketCap: '~ trillion',
-    allTimeHigh: ',750',
-    allTimeLow: '.01',
+    marketCap: '~$1 trillion',
+    allTimeHigh: '$73,750',
+    allTimeLow: '$0.01',
     useCases: ['Store of value', 'Digital gold', 'Cross-border payments', 'Hedge against inflation'],
     features: ['Decentralized', 'Secure', 'Limited supply', 'Global', 'Censorship-resistant'],
     strengths: ['First mover advantage', 'Strongest network effect', 'Most secure', 'Global recognition'],
@@ -125,7 +125,7 @@ export const cryptoDatabase: Record<string, CryptoInfo> = {
     name: 'Ethereum',
     fullName: 'Ethereum (ETH)',
     description: 'Ethereum is a decentralized global computer that enables smart contracts and dApps.',
-    longDescription: 'Ethereum is a decentralized blockchain with smart contract functionality. It\'s the foundation for DeFi, NFTs, and countless Web3 applications.',
+    longDescription: 'Ethereum is a decentralized blockchain with smart contract functionality. It\'s the foundation for DeFi, NFTs, and countless Web3 applications. Ethereum transitioned to Proof of Stake in 2022, reducing energy consumption by 99.9%.',
     founded: '2015',
     founder: 'Vitalik Buterin',
     website: 'https://ethereum.org',
@@ -135,20 +135,22 @@ export const cryptoDatabase: Record<string, CryptoInfo> = {
     consensus: 'Proof of Stake (PoS)',
     maxSupply: 'No max supply',
     circulatingSupply: '~120 million ETH',
-    marketCap: '~ billion',
-    allTimeHigh: ',800',
-    allTimeLow: '.40',
+    marketCap: '~$350 billion',
+    allTimeHigh: '$4,800',
+    allTimeLow: '$0.40',
     useCases: ['Smart contracts', 'DeFi', 'NFTs', 'DAOs', 'Layer 2 solutions'],
-    features: ['Programmable', 'EVM compatible', 'Large ecosystem', 'Active development']
+    features: ['Programmable', 'EVM compatible', 'Large ecosystem', 'Active development'],
+    strengths: ['First-mover in smart contracts', 'Largest developer ecosystem', 'Most dApps'],
+    weaknesses: ['High gas fees during congestion', 'Scalability challenges', 'Competition from L1s']
   }
 }
 
-export function getCryptoInfo(symbol: string): CryptoInfo {
+export function getCryptoInfo(symbolName: string): CryptoInfo {
   const defaultInfo: CryptoInfo = {
-    name: symbol,
-    fullName: ${symbol} (),
-    description: ${symbol} is a cryptocurrency trading on various exchanges.,
-    longDescription: ${symbol} is a digital asset in the cryptocurrency market. More information will be updated soon.,
+    name: symbolName,
+    fullName: `${symbolName} (${symbolName})`,
+    description: `${symbolName} is a cryptocurrency trading on various exchanges.`,
+    longDescription: `${symbolName} is a digital asset in the cryptocurrency market. More information will be updated soon.`,
     founded: 'N/A',
     founder: 'Unknown',
     website: '#',
@@ -159,8 +161,7 @@ export function getCryptoInfo(symbol: string): CryptoInfo {
     allTimeHigh: 'Unknown',
     allTimeLow: 'Unknown',
     useCases: ['Trading', 'Investment', 'Digital asset'],
-    features: ['Cryptocurrency', 'Digital asset', 'Block-based']
+    features: ['Cryptocurrency', 'Digital asset', 'Blockchain-based']
   }
-
-  return cryptoDatabase[symbol] || defaultInfo
+  return cryptoDatabase[symbolName] || defaultInfo
 }

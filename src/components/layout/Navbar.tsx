@@ -1,16 +1,22 @@
 ﻿'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Sparkles, Home, LineChart, Bot, MessageSquare, Brain, DollarSign, GraduationCap } from 'lucide-react'
+import { Menu, X, Sparkles, Home, LineChart, Bot, MessageSquare, Brain, DollarSign, GraduationCap, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -28,7 +34,6 @@ export default function Navbar() {
     <nav className="bg-white dark:bg-gray-900 shadow-sm fixed w-full z-50 border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Sparkles className="h-8 w-8 text-primary" />
@@ -38,7 +43,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
               const active = isActive(item.href)
@@ -46,26 +50,38 @@ export default function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`relative px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5
-                    ${active 
-                      ? 'text-primary bg-primary/10' 
-                      : 'text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`}
+                  className={`relative px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${active ? 'text-primary bg-primary/10' : 'text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.name}
                 </Link>
               )
             })}
-            <ThemeToggle />
+            
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                aria-label="Toggle dark mode"
+              >
+                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
+            )}
+            
             <Button asChild size="sm" className="ml-2">
               <Link href="/login">Login</Link>
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
-            <ThemeToggle />
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              >
+                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
+            )}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 transition"
@@ -75,7 +91,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -89,11 +104,7 @@ export default function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-3 rounded-md text-sm font-medium transition-colors
-                    ${active 
-                      ? 'text-primary bg-primary/10' 
-                      : 'text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`}
+                  className={`flex items-center gap-2 px-3 py-3 rounded-md text-sm font-medium transition-colors ${active ? 'text-primary bg-primary/10' : 'text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                   onClick={() => setIsOpen(false)}
                 >
                   <item.icon className="h-5 w-5" />
