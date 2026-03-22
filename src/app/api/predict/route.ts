@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     // Use XGBoost-only predictor
     const pythonScript = path.join(process.cwd(), 'src/lib/ml/predict_xgb.py')
     const { stdout, stderr } = await execAsync(
-      `python "${pythonScript}" --symbol ${symbol} --price ${currentPrice}`
+      `python3 "${pythonScript}" --symbol ${symbol} --price ${currentPrice}`
     )
     
     if (stderr) {
