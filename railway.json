@@ -1,5 +1,5 @@
-﻿{
-  "": "https://railway.com/railway.schema.json",
+{
+  "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
     "buildCommand": "apt-get update && apt-get install -y python3 python3-pip && pip3 install -r requirements.txt && npm install && npm run build"
