@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getLivePrice } from '@/lib/api/live-prices'
 import { exec } from 'child_process'
 import { promisify } from 'util'
@@ -10,11 +10,11 @@ export async function POST(request: Request) {
   try {
     const { symbol = 'BTC' } = await request.json()
     
-    console.log(`ðŸ”® Predicting ${symbol} with XGBoost...`)
+    console.log(`🔮 Predicting ${symbol} with XGBoost...`)
     
     // Get LIVE current price
     const currentPrice = await getLivePrice(symbol)
-    console.log(`ðŸ“ Live price: $${currentPrice}`)
+    console.log(`📍 Live price: $${currentPrice}`)
     
     // Use XGBoost-only predictor
     const pythonScript = path.join(process.cwd(), 'src/lib/ml/predict_xgb.py')
