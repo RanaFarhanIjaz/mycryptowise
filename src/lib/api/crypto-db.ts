@@ -142,7 +142,48 @@ export const cryptoDatabase: Record<string, CryptoInfo> = {
     features: ['Programmable', 'EVM compatible', 'Large ecosystem', 'Active development'],
     strengths: ['First-mover in smart contracts', 'Largest developer ecosystem', 'Most dApps'],
     weaknesses: ['High gas fees during congestion', 'Scalability challenges', 'Competition from L1s']
-  }
+  },
+
+// Add to cryptoDatabase object
+GOLD: {
+  name: 'Gold',
+  fullName: 'Gold (XAU)',
+  description: 'Gold is a precious metal and a traditional store of value.',
+  longDescription: 'Gold is one of the oldest and most trusted stores of value. It is often used as a hedge against inflation and economic uncertainty.',
+  founded: 'Ancient times',
+  founder: 'N/A',
+  website: 'https://www.gold.org',
+  consensus: 'Physical Asset',
+  maxSupply: 'Limited (Earth\'s crust)',
+  circulatingSupply: '~200,000 tons',
+  marketCap: '~$12 trillion',
+  allTimeHigh: '$2,750',
+  allTimeLow: '$35',
+  useCases: ['Store of value', 'Jewelry', 'Industrial applications', 'Central bank reserves'],
+  features: ['Tangible asset', 'Liquid market', 'Hedge against inflation'],
+  strengths: ['Store of value for millennia', 'High liquidity', 'Global acceptance'],
+  weaknesses: ['No yield', 'Storage costs', 'Volatile in short term']
+},
+SILVER: {
+  name: 'Silver',
+  fullName: 'Silver (XAG)',
+  description: 'Silver is a precious metal with industrial and investment applications.',
+  longDescription: 'Silver is both a precious metal and an industrial commodity. It has investment value and extensive industrial uses.',
+  founded: 'Ancient times',
+  founder: 'N/A',
+  website: 'https://www.silverinstitute.org',
+  consensus: 'Physical Asset',
+  maxSupply: 'Limited',
+  circulatingSupply: '~1.7 million tons',
+  marketCap: '~$1.2 trillion',
+  allTimeHigh: '$50',
+  allTimeLow: '$4',
+  useCases: ['Investment', 'Jewelry', 'Electronics', 'Solar panels', 'Medical applications'],
+  features: ['Dual demand (investment + industrial)', 'Affordable', 'High conductivity'],
+  strengths: ['Industrial demand growth', 'Affordable entry point', 'High volatility = trading opportunity'],
+  weaknesses: ['Industrial demand can drop', 'High volatility', 'Storage costs']
+}
+
 }
 
 export function getCryptoInfo(symbolName: string): CryptoInfo {
@@ -163,5 +204,7 @@ export function getCryptoInfo(symbolName: string): CryptoInfo {
     useCases: ['Trading', 'Investment', 'Digital asset'],
     features: ['Cryptocurrency', 'Digital asset', 'Blockchain-based']
   }
+
+
   return cryptoDatabase[symbolName] || defaultInfo
 }

@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { generateHardwareId, validateActivation } from '@/lib/bots/license-generator'
 
 const licenses: any[] = []

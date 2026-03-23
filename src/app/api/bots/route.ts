@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { bots } from '@/lib/bots/bots-data'
 import { generateLicenseKey } from '@/lib/bots/license-generator'
 import crypto from 'crypto'
