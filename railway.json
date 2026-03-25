@@ -1,8 +1,8 @@
-{
-  "$schema": "https://railway.com/railway.schema.json",
+﻿{
+  "": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "apt-get update && apt-get install -y python3 python3-venv python3-pip python3-setuptools && python3 -m venv /opt/venv && source /opt/venv/bin/activate && pip install --upgrade pip setuptools wheel && pip install -r requirements.txt && npm install && npm run build"
+    "buildCommand": "npm install && npm run build"
   },
   "deploy": {
     "runtime": "V2",
@@ -17,6 +17,6 @@
     },
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10,
-    "startCommand": "source /opt/venv/bin/activate && npm start"
+    "startCommand": "npm start"
   }
 }
