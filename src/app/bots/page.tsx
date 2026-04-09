@@ -15,7 +15,11 @@ import {
   Search,
   ArrowRight,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  Copy,
+  CheckCircle,
+  Send,
+  Mail
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -23,6 +27,10 @@ import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { bots } from '@/lib/bots/bots-data'
 import toast from 'react-hot-toast'
+
+// TRC20 USDT Address (Replace with your actual address)
+const TRC20_ADDRESS = "TXgQZf7YQk5Qk5Qk5Qk5Qk5Qk5Qk5Qk5Qk5"
+const BOTS_EMAIL = "bots@cryptowise.com"
 
 const iconMap: any = {
   Zap, TrendingUp, Activity, BarChart3, Brain, DollarSign, Sparkles
@@ -40,7 +48,14 @@ export default function BotsPage() {
   const [selectedBot, setSelectedBot] = useState<any>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [licenseType, setLicenseType] = useState<'lifetime' | 'monthly'>('lifetime')
-  const [processing, setProcessing] = useState(false)
+  const [step, setStep] = useState<'details' | 'payment' | 'confirmation'>('details')
+  const [copied, setCopied] = useState(false)
+  const [userDetails, setUserDetails] = useState({
+    name: '',
+    email: '',
+    transactionId: ''
+  })
+  const [submitting, setSubmitting] = useState(false)
 
   const filteredBots = bots.filter(bot => {
     const matchesSearch = bot.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -51,52 +66,52 @@ export default function BotsPage() {
 
   const risks = ['all', 'Low', 'Medium', 'High']
 
-  const handlePurchase = async () => {
-    if (!selectedBot) return
-    
-    setProcessing(true)
-    
-    try {
-      const paymentResponse = await fetch('/api/payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          botId: selectedBot.id,
-          amount: licenseType === 'lifetime' ? selectedBot.price : selectedBot.monthlyRental,
-          paymentMethod: 'card',
-          userDetails: { email: 'user@example.com' }
-        })
-      })
-      
-      const paymentData = await paymentResponse.json()
-      
-      if (!paymentData.success) {
-        throw new Error('Payment failed')
-      }
-      
-      const purchaseResponse = await fetch('/api/bots', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          botId: selectedBot.id,
-          userId: 'user-123',
-          paymentMethod: 'card',
-          licenseType
-        })
-      })
-      
-      const purchaseData = await purchaseResponse.json()
-      
-      if (purchaseData.success) {
-        toast.success('Purchase successful! Check your dashboard.')
-        setSelectedBot(null)
-        window.location.href = '/dashboard/my-bots'
-      }
-    } catch (error) {
-      toast.error('Purchase failed. Please try again.')
-    } finally {
-      setProcessing(false)
+  const copyAddress = () => {
+    navigator.clipboard.writeText(TRC20_ADDRESS)
+    setCopied(true)
+    toast.success('Address copied to clipboard!')
+    setTimeout(() => setCopied(false), 3000)
+  }
+
+  const handleSendEmail = async () => {
+    if (!userDetails.name || !userDetails.email || !userDetails.transactionId) {
+      toast.error('Please fill all fields')
+      return
     }
+
+    setSubmitting(true)
+
+    // Create email content
+    const emailContent = `
+      Bot Purchase Details
+      --------------------
+      Customer Name: ${userDetails.name}
+      Customer Email: ${userDetails.email}
+      Bot Name: ${selectedBot?.name}
+      License Type: ${licenseType}
+      Amount: $${licenseType === 'lifetime' ? selectedBot?.price : selectedBot?.monthlyRental} USDT
+      Transaction ID: ${userDetails.transactionId}
+      Payment Date: ${new Date().toLocaleString()}
+    `
+
+    // Create mailto link
+    const mailtoLink = `mailto:${BOTS_EMAIL}?subject=Bot Purchase - ${selectedBot?.name} - ${userDetails.name}&body=${encodeURIComponent(emailContent)}`
+    
+    // Open email client
+    window.location.href = mailtoLink
+    
+    setStep('confirmation')
+    setSubmitting(false)
+    
+    toast.success('Email client opened! Please send the email to complete your purchase.')
+  }
+
+  const resetModal = () => {
+    setSelectedBot(null)
+    setStep('details')
+    setLicenseType('lifetime')
+    setUserDetails({ name: '', email: '', transactionId: '' })
+    setCopied(false)
   }
 
   return (
@@ -116,9 +131,6 @@ export default function BotsPage() {
           </div>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Deploy automated trading bots with MQL5 files and license keys
-            <span className="block text-sm mt-2 text-yellow-600 dark:text-yellow-400">
-              ⚠️ All trading involves risk. Past performance doesn't guarantee future results.
-            </span>
           </p>
         </motion.div>
 
@@ -286,17 +298,6 @@ export default function BotsPage() {
                     </div>
 
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">Trading Pairs</p>
-                      <div className="flex flex-wrap gap-1">
-                        {bot.pairs.slice(0, 3).map((pair) => (
-                          <span key={pair} className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                            {pair}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
                       <p className="text-sm text-gray-500 mb-1">Key Features</p>
                       <ul className="space-y-1">
                         {bot.features.slice(0, 2).map((feature, i) => (
@@ -337,7 +338,7 @@ export default function BotsPage() {
           </motion.div>
         )}
 
-        {/* Purchase Modal */}
+        {/* Purchase Modal with TRC20 Payment */}
         <AnimatePresence>
           {selectedBot && (
             <motion.div
@@ -345,69 +346,189 @@ export default function BotsPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-              onClick={() => setSelectedBot(null)}
+              onClick={resetModal}
             >
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6"
+                className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h2 className="text-2xl font-bold mb-4">Purchase {selectedBot.name}</h2>
-                
-                <div className="space-y-4 mb-6">
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => setLicenseType('lifetime')}
-                      className={`flex-1 p-4 rounded-lg border-2 transition ${
-                        licenseType === 'lifetime'
-                          ? 'border-primary bg-primary/5'
-                          : 'border-gray-200 dark:border-gray-700'
-                      }`}
-                    >
-                      <p className="font-bold text-lg">${selectedBot.price}</p>
-                      <p className="text-sm text-gray-500">Lifetime</p>
-                    </button>
-                    {selectedBot.monthlyRental && (
-                      <button
-                        onClick={() => setLicenseType('monthly')}
-                        className={`flex-1 p-4 rounded-lg border-2 transition ${
-                          licenseType === 'monthly'
-                            ? 'border-primary bg-primary/5'
-                            : 'border-gray-200 dark:border-gray-700'
-                        }`}
+                {/* Step 1: Details */}
+                {step === 'details' && (
+                  <>
+                    <h2 className="text-2xl font-bold mb-4">Purchase {selectedBot.name}</h2>
+                    
+                    <div className="space-y-4 mb-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Name</label>
+                        <Input
+                          placeholder="Enter your full name"
+                          value={userDetails.name}
+                          onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                        <Input
+                          type="email"
+                          placeholder="your@email.com"
+                          value={userDetails.email}
+                          onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
+                          className="mt-1"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">License will be sent to this email</p>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">License Type</label>
+                        <div className="flex gap-4 mt-2">
+                          <button
+                            onClick={() => setLicenseType('lifetime')}
+                            className={`flex-1 p-4 rounded-lg border-2 transition ${
+                              licenseType === 'lifetime'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-gray-200 dark:border-gray-700'
+                            }`}
+                          >
+                            <p className="font-bold text-lg">${selectedBot.price}</p>
+                            <p className="text-sm text-gray-500">Lifetime</p>
+                          </button>
+                          {selectedBot.monthlyRental && (
+                            <button
+                              onClick={() => setLicenseType('monthly')}
+                              className={`flex-1 p-4 rounded-lg border-2 transition ${
+                                licenseType === 'monthly'
+                                  ? 'border-primary bg-primary/5'
+                                  : 'border-gray-200 dark:border-gray-700'
+                              }`}
+                            >
+                              <p className="font-bold text-lg">${selectedBot.monthlyRental}</p>
+                              <p className="text-sm text-gray-500">Monthly</p>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button variant="outline" className="flex-1" onClick={resetModal}>
+                        Cancel
+                      </Button>
+                      <Button 
+                        className="flex-1"
+                        onClick={() => setStep('payment')}
+                        disabled={!userDetails.name || !userDetails.email}
                       >
-                        <p className="font-bold text-lg">${selectedBot.monthlyRental}</p>
-                        <p className="text-sm text-gray-500">Monthly</p>
-                      </button>
-                    )}
-                  </div>
+                        Continue to Payment
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </>
+                )}
 
-                  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                    <p className="text-sm text-yellow-700 dark:text-yellow-400 flex items-start gap-2">
-                      <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-                      You'll receive a unique license key and MQL5 file immediately after payment.
-                    </p>
-                  </div>
-                </div>
+                {/* Step 2: Payment - TRC20 Address */}
+                {step === 'payment' && (
+                  <>
+                    <h2 className="text-2xl font-bold mb-4">Complete Payment</h2>
+                    
+                    <div className="space-y-4">
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">Amount to Pay:</p>
+                        <p className="text-3xl font-bold">
+                          ${licenseType === 'lifetime' ? selectedBot.price : selectedBot.monthlyRental} USDT
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">on TRC20 Network</p>
+                      </div>
 
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setSelectedBot(null)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={handlePurchase}
-                    disabled={processing}
-                  >
-                    {processing ? 'Processing...' : 'Pay Now'}
-                  </Button>
-                </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Send USDT (TRC20) to this address:</label>
+                        <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                          <code className="text-sm break-all font-mono">{TRC20_ADDRESS}</code>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-2 w-full"
+                          onClick={copyAddress}
+                        >
+                          {copied ? <CheckCircle className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+                          {copied ? 'Copied!' : 'Copy Address'}
+                        </Button>
+                      </div>
+
+                      <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                        <p className="text-sm text-yellow-700 dark:text-yellow-400 flex items-start gap-2">
+                          <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                          Send exactly ${licenseType === 'lifetime' ? selectedBot.price : selectedBot.monthlyRental} USDT on TRC20 network only.
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Transaction ID (TxID)</label>
+                        <Input
+                          placeholder="Enter your TRC20 transaction ID"
+                          value={userDetails.transactionId}
+                          onChange={(e) => setUserDetails({ ...userDetails, transactionId: e.target.value })}
+                          className="mt-1"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Paste the transaction hash from your wallet</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 mt-6">
+                      <Button variant="outline" className="flex-1" onClick={() => setStep('details')}>
+                        Back
+                      </Button>
+                      <Button 
+                        className="flex-1"
+                        onClick={handleSendEmail}
+                        disabled={!userDetails.transactionId || submitting}
+                      >
+                        <Mail className="h-4 w-4 mr-2" />
+                        {submitting ? 'Processing...' : 'Send Email'}
+                      </Button>
+                    </div>
+                  </>
+                )}
+
+                {/* Step 3: Confirmation */}
+                {step === 'confirmation' && (
+                  <>
+                    <div className="text-center py-6">
+                      <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="h-8 w-8 text-green-500" />
+                      </div>
+                      <h2 className="text-2xl font-bold mb-2">Email Sent!</h2>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">
+                        We've sent a confirmation email to {userDetails.email}
+                      </p>
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-left mb-4">
+                        <p className="text-sm font-medium mb-2">What happens next?</p>
+                        <ul className="text-sm space-y-2">
+                          <li className="flex items-start gap-2">
+                            <Check className="h-4 w-4 text-green-500 mt-0.5" />
+                            <span>Our team will verify your transaction</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="h-4 w-4 text-green-500 mt-0.5" />
+                            <span>You'll receive your license key within 24 hours</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="h-4 w-4 text-green-500 mt-0.5" />
+                            <span>Check your email for download instructions</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <Button onClick={resetModal} className="w-full">
+                        Browse More Bots
+                      </Button>
+                    </div>
+                  </>
+                )}
               </motion.div>
             </motion.div>
           )}
@@ -427,9 +548,7 @@ export default function BotsPage() {
               <p className="text-sm text-yellow-700 dark:text-yellow-400">
                 Automated trading bots are tools that execute trades based on predefined strategies. 
                 Past performance does not guarantee future results. Cryptocurrency and Forex trading 
-                involves substantial risk of loss. You should carefully consider whether trading is 
-                suitable for you in light of your financial circumstances. License keys are non-refundable 
-                once issued.
+                involves substantial risk of loss. License keys are non-refundable once issued.
               </p>
             </div>
           </div>

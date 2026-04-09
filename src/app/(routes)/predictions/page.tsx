@@ -51,7 +51,7 @@ export default function PredictionsPage() {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
-  const symbols = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'GOLD', 'SILVER']
+  const symbols = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP']
 
   const fetchPrediction = async () => {
     if (!selectedSymbol) {

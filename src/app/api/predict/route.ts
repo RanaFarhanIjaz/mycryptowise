@@ -6,6 +6,35 @@ import path from 'path'
 
 const execAsync = promisify(exec)
 
+// Function to try both python commands
+async function runPythonScript(script: string, symbol: string, price: number, modelType: string) {
+  const pythonCommands = ['python3', 'python'];
+  let lastError: Error | null = null;
+  
+  for (const pythonCmd of pythonCommands) {
+    try {
+      console.log(`Trying with: ${pythonCmd}`);
+      const { stdout, stderr } = await execAsync(
+        `${pythonCmd} "${script}" --symbol ${symbol} --price ${price} --model ${modelType}`,
+        { timeout: 30000 }
+      );
+      
+      if (stderr && !stderr.includes('Universal ML Predictor')) {
+        console.log(`⚠️ Stderr from ${pythonCmd}: ${stderr.substring(0, 200)}`);
+      }
+      
+      console.log(`✅ Success with: ${pythonCmd}`);
+      return { stdout, stderr };
+      
+    } catch (error: any) {
+      console.log(`❌ Failed with ${pythonCmd}: ${error.message}`);
+      lastError = error;
+    }
+  }
+  
+  throw lastError || new Error('No python command found');
+}
+
 export async function POST(request: Request) {
   const startTime = Date.now()
   
@@ -43,14 +72,8 @@ export async function POST(request: Request) {
     const script = path.join(process.cwd(), 'src/lib/ml/predict_universal.py')
     
     try {
-      const { stdout, stderr } = await execAsync(
-        `python "${script}" --symbol ${symbol} --price ${currentPrice} --model ${modelType}`,
-        { timeout: 30000 }
-      )
-      
-      if (stderr && !stderr.includes('Universal ML Predictor')) {
-        console.log(`⚠️ Stderr: ${stderr.substring(0, 200)}`)
-      }
+      // Try python3 first, then fallback to python
+      const { stdout, stderr } = await runPythonScript(script, symbol, currentPrice, modelType)
       
       const result = JSON.parse(stdout)
       

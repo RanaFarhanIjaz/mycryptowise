@@ -167,8 +167,7 @@ RESPONSE RULES:
 1. ALWAYS give direction/analysis, not just price
 2. Tell if asset is going UP, DOWN, or SIDEWAYS
 3. Give next likely level (support/resistance)
-4. Use Hindi if user speaks Hindi
-5. Be concise but informative
+4. Be concise but informative
 
 ${specificContext ? `\nSPECIFIC QUERY CONTEXT: ${specificContext}` : ''}
 

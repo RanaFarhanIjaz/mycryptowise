@@ -52,10 +52,12 @@ interface PriceData {
   volume: number
   quoteVolume: number
 }
+// src/lib/crypto-database.ts
 
-interface CryptoInfo {
+export interface CryptoInfo {
   name: string
   fullName: string
+  symbol?: string
   description: string
   longDescription: string
   founded: string
@@ -73,23 +75,185 @@ interface CryptoInfo {
   allTimeLow: string
   useCases: string[]
   features: string[]
-  roadmap?: { year: string; event: string }[]
-  competitors?: string[]
   strengths?: string[]
   weaknesses?: string[]
   whyInvest?: string[]
   futureOutlook?: string[]
+  competitors?: string[]
+  roadmap?: Array<{ year: string; event: string }>
+  price?: number
+  change24h?: number
 }
 
-// Crypto Database
+// Complete Crypto Database
 const cryptoDatabase: Record<string, CryptoInfo> = {
+  // ============================================
+  // BITCOIN (BTC)
+  // ============================================
+  BTC: {
+    name: 'Bitcoin',
+    fullName: 'Bitcoin (BTC)',
+    symbol: 'BTC',
+    description: 'Bitcoin is the first decentralized cryptocurrency, operating on a peer-to-peer network without central authority.',
+    longDescription: 'Bitcoin is the world\'s first cryptocurrency, created in 2009 by an anonymous person or group known as Satoshi Nakamoto. It operates on a decentralized network using blockchain technology and proof-of-work consensus. Bitcoin introduced the concept of digital scarcity and has become "digital gold" - a store of value that is borderless, censorship-resistant, and deflationary by design.',
+    founded: '2009',
+    founder: 'Satoshi Nakamoto',
+    website: 'https://bitcoin.org',
+    whitepaper: 'https://bitcoin.org/bitcoin.pdf',
+    github: 'https://github.com/bitcoin',
+    twitter: 'https://twitter.com/bitcoin',
+    discord: 'https://discord.gg/bitcoin',
+    consensus: 'Proof of Work (PoW)',
+    maxSupply: '21,000,000 BTC',
+    circulatingSupply: '~19,600,000 BTC',
+    marketCap: '~$1,200,000,000,000',
+    allTimeHigh: '$126,750',
+    allTimeLow: '$0.01',
+    useCases: [
+      'Store of value (Digital Gold)',
+      'Cross-border payments',
+      'Hedge against inflation',
+      'Remittances',
+      'Settlement layer'
+    ],
+    features: [
+      'Decentralized network',
+      'Limited supply (21 million)',
+      'Proof of Work consensus',
+      'Halving events every 4 years',
+      'Most secure blockchain',
+      'Global and censorship-resistant'
+    ],
+    strengths: [
+      'First mover advantage',
+      'Strongest network effect',
+      'Most secure blockchain',
+      'Global brand recognition',
+      'Institutional adoption growing'
+    ],
+    weaknesses: [
+      'Slow transaction speed (7 TPS)',
+      'High energy consumption',
+      'Limited smart contract functionality',
+      'Scalability challenges'
+    ],
+    whyInvest: [
+      'Digital scarcity similar to gold',
+      'Fixed supply protects against inflation',
+      'Growing institutional adoption',
+      'ETF approval brings new capital',
+      'Global store of value'
+    ],
+    futureOutlook: [
+      'Lightning Network scaling solutions',
+      'Increased institutional adoption',
+      'Potential as global reserve asset',
+      'Taproot upgrades for privacy',
+      'Ordinals and NFTs on Bitcoin'
+    ],
+    competitors: ['Ethereum', 'Litecoin', 'Bitcoin Cash', 'Monero'],
+    roadmap: [
+      { year: '2009', event: 'Bitcoin Network Launch' },
+      { year: '2010', event: 'First Real-world Transaction (10,000 BTC for pizza)' },
+      { year: '2012', event: 'First Halving' },
+      { year: '2017', event: 'SegWit Activation' },
+      { year: '2020', event: 'Third Halving' },
+      { year: '2021', event: 'Taproot Upgrade' },
+      { year: '2024', event: 'Fourth Halving' },
+      { year: '2025', event: 'Lightning Network Growth' }
+    ]
+  },
+
+  // ============================================
+  // ETHEREUM (ETH)
+  // ============================================
+  ETH: {
+    name: 'Ethereum',
+    fullName: 'Ethereum (ETH)',
+    symbol: 'ETH',
+    description: 'Ethereum is a decentralized global computer that enables smart contracts and decentralized applications.',
+    longDescription: 'Ethereum is a decentralized blockchain with smart contract functionality. It\'s the foundation for DeFi, NFTs, and countless Web3 applications. Ethereum transitioned to Proof of Stake in 2022 (The Merge), reducing energy consumption by 99.9%. It remains the most active blockchain for developers with thousands of dApps.',
+    founded: '2015',
+    founder: 'Vitalik Buterin (co-founders: Gavin Wood, Joseph Lubin)',
+    website: 'https://ethereum.org',
+    whitepaper: 'https://ethereum.org/whitepaper',
+    github: 'https://github.com/ethereum',
+    twitter: 'https://twitter.com/ethereum',
+    discord: 'https://discord.gg/ethereum',
+    consensus: 'Proof of Stake (PoS)',
+    maxSupply: 'No max supply (inflationary)',
+    circulatingSupply: '~120,000,000 ETH',
+    marketCap: '~$350,000,000,000',
+    allTimeHigh: '$4,878',
+    allTimeLow: '$0.42',
+    useCases: [
+      'Smart contracts',
+      'Decentralized Finance (DeFi)',
+      'NFTs and digital art',
+      'Decentralized Autonomous Organizations (DAOs)',
+      'Layer 2 scaling solutions',
+      'Web3 gaming'
+    ],
+    features: [
+      'Smart contract platform',
+      'EVM (Ethereum Virtual Machine)',
+      'Proof of Stake consensus',
+      'Layer 2 compatibility',
+      'Large developer ecosystem',
+      'ERC-20 token standard'
+    ],
+    strengths: [
+      'First-mover in smart contracts',
+      'Largest developer ecosystem',
+      'Most active dApps',
+      'Strong DeFi and NFT presence',
+      'Continuous upgrades (Shanghai, Cancun)'
+    ],
+    weaknesses: [
+      'High gas fees during congestion',
+      'Scalability challenges',
+      'Competition from faster L1s',
+      'Complex upgrades'
+    ],
+    whyInvest: [
+      'Foundation of DeFi and Web3',
+      'Strong network effects',
+      'Continuous development and upgrades',
+      'Staking yields (4-6% APY)',
+      'Institutional interest growing'
+    ],
+    futureOutlook: [
+      'Danksharding for scalability',
+      'Further fee reductions',
+      'Account abstraction improvements',
+      'ZK-rollup adoption',
+      'Enterprise adoption of private chains'
+    ],
+    competitors: ['Solana', 'Cardano', 'Avalanche', 'Polygon', 'BNB Chain', 'Near Protocol'],
+    roadmap: [
+      { year: '2015', event: 'Ethereum Mainnet Launch' },
+      { year: '2016', event: 'DAO Fork & Ethereum Classic Split' },
+      { year: '2017', event: 'DeFi Summer & ICO Boom' },
+      { year: '2020', event: 'Beacon Chain Launch (Phase 0)' },
+      { year: '2021', event: 'EIP-1559 (Fee Burn)' },
+      { year: '2022', event: 'The Merge (PoS Transition)' },
+      { year: '2023', event: 'Shanghai Upgrade (Staking Withdrawals)' },
+      { year: '2024', event: 'Cancun Upgrade (Proto-Danksharding)' },
+      { year: '2025', event: 'Verkle Trees & Further Scaling' }
+    ]
+  },
+
+  // ============================================
+  // SOLANA (SOL)
+  // ============================================
   SOL: {
     name: 'Solana',
     fullName: 'Solana (SOL)',
-    description: 'Solana is a high-performance blockchain supporting builders around the world creating crypto apps that scale today.',
-    longDescription: 'Solana is a decentralized blockchain built to enable scalable, user-friendly apps for the world. It achieves high transaction speeds through a unique combination of proof-of-history (PoH) and proof-of-stake (PoS) consensus mechanisms. Solana can process 50,000+ transactions per second with sub-second finality and extremely low fees.',
+    symbol: 'SOL',
+    description: 'Solana is a high-performance blockchain supporting builders creating crypto apps that scale today.',
+    longDescription: 'Solana is a decentralized blockchain built to enable scalable, user-friendly apps for the world. It achieves high transaction speeds through a unique combination of proof-of-history (PoH) and proof-of-stake (PoS) consensus mechanisms. Solana can process 50,000+ transactions per second with sub-second finality and extremely low fees (<$0.01).',
     founded: '2020',
-    founder: 'Anatoly Yakovenko',
+    founder: 'Anatoly Yakovenko (co-founders: Raj Gokal)',
     website: 'https://solana.com',
     whitepaper: 'https://solana.com/solana-whitepaper.pdf',
     github: 'https://github.com/solana-labs',
@@ -97,116 +261,438 @@ const cryptoDatabase: Record<string, CryptoInfo> = {
     discord: 'https://discord.gg/solana',
     consensus: 'Proof of History (PoH) + Proof of Stake (PoS)',
     maxSupply: 'No max supply (inflationary)',
-    circulatingSupply: '~450 million SOL',
-    marketCap: '~$45 billion',
-    allTimeHigh: '$260',
+    circulatingSupply: '~450,000,000 SOL',
+    marketCap: '~$45,000,000,000',
+    allTimeHigh: '$295',
     allTimeLow: '$0.50',
     useCases: [
       'DeFi applications',
-      'NFT marketplaces',
+      'NFT marketplaces (Tensor, Magic Eden)',
       'Web3 gaming',
       'Decentralized exchanges',
-      'Payment processing'
+      'Payment processing',
+      'Mobile dApps (Solana Saga)'
     ],
     features: [
-      '50,000+ TPS (transactions per second)',
+      'Proof of History consensus',
+      '50,000+ TPS',
       'Sub-second finality',
-      'Low transaction fees (<$0.01)',
-      'EVM compatibility via Neon',
+      'Low fees (<$0.01)',
+      'EVM compatibility (Neon)',
       'Energy efficient'
     ],
-    roadmap: [
-      { year: '2020', event: 'Mainnet Beta Launch' },
-      { year: '2021', event: 'DeFi Summer on Solana' },
-      { year: '2022', event: 'Solana Mobile Stack Launch' },
-      { year: '2023', event: 'Solana Saga Phone Release' },
-      { year: '2024', event: 'Firedancer Validator Client' },
-      { year: '2025', event: 'Token Extensions & Upgrades' }
-    ],
-    competitors: ['Ethereum', 'BNB Chain', 'Avalanche', 'Polygon', 'Near Protocol'],
     strengths: [
       'Extremely fast transaction speed',
       'Very low fees',
       'Growing ecosystem',
       'Strong developer community',
-      'Institutional adoption'
+      'Institutional adoption (Visa, Shopify)',
+      'Mobile-first approach'
     ],
     weaknesses: [
-      'Network outages in past',
+      'Network outages in the past',
       'Centralization concerns',
       'Competition from Ethereum L2s',
-      'Younger ecosystem compared to Ethereum'
+      'Younger ecosystem than Ethereum'
     ],
     whyInvest: [
       'High scalability solution for mass adoption',
-      'Strong venture capital backing',
+      'Strong venture capital backing (a16z, Multicoin)',
       'Growing DeFi and NFT ecosystem',
-      'Real-world partnerships and adoption',
+      'Real-world partnerships (Visa, Google, Shopify)',
       'Innovative technology stack'
     ],
     futureOutlook: [
-      'Firedancer validator client to improve decentralization',
-      'Solana Mobile Stack for Web3 adoption on mobile',
+      'Firedancer validator client (Jupiter) for decentralization',
+      'Solana Mobile Stack for Web3 adoption',
       'Token extensions for enterprise use cases',
       'Potential ETF approval',
       'Expansion in Asian markets'
+    ],
+    competitors: ['Ethereum', 'BNB Chain', 'Avalanche', 'Polygon', 'Near Protocol', 'Sui'],
+    roadmap: [
+      { year: '2020', event: 'Mainnet Beta Launch' },
+      { year: '2021', event: 'DeFi Summer & Solana Season' },
+      { year: '2022', event: 'Solana Mobile Stack Launch' },
+      { year: '2023', event: 'Solana Saga Phone Release' },
+      { year: '2024', event: 'Token Extensions & Firedancer Alpha' },
+      { year: '2025', event: 'Firedancer Full Launch & ZK Compression' }
     ]
   },
-  BTC: {
-    name: 'Bitcoin',
-    fullName: 'Bitcoin (BTC)',
-    description: 'Bitcoin is the first decentralized cryptocurrency, operating on a peer-to-peer network without central authority.',
-    longDescription: 'Bitcoin is the world\'s first cryptocurrency, created in 2009 by an anonymous person or group known as Satoshi Nakamoto. It operates on a decentralized network using blockchain technology and proof-of-work consensus.',
-    founded: '2009',
-    founder: 'Satoshi Nakamoto',
-    website: 'https://bitcoin.org',
-    whitepaper: 'https://bitcoin.org/bitcoin.pdf',
-    github: 'https://github.com/bitcoin',
-    twitter: 'https://twitter.com/bitcoin',
-    consensus: 'Proof of Work (PoW)',
-    maxSupply: '21 million BTC',
-    circulatingSupply: '~19.5 million BTC',
-    marketCap: '~$1 trillion',
-    allTimeHigh: '$73,750',
-    allTimeLow: '$0.01',
-    useCases: ['Store of value', 'Digital gold', 'Cross-border payments', 'Hedge against inflation'],
-    features: ['Decentralized', 'Secure', 'Limited supply', 'Global', 'Censorship-resistant'],
-    strengths: ['First mover advantage', 'Strongest network effect', 'Most secure', 'Global recognition'],
-    weaknesses: ['Slow transactions', 'High energy consumption', 'Limited scalability']
-  },
-  ETH: {
-    name: 'Ethereum',
-    fullName: 'Ethereum (ETH)',
-    description: 'Ethereum is a decentralized global computer that enables smart contracts and dApps.',
-    longDescription: 'Ethereum is a decentralized blockchain with smart contract functionality. It\'s the foundation for DeFi, NFTs, and countless Web3 applications. Ethereum transitioned to Proof of Stake in 2022, reducing energy consumption by 99.9%.',
-    founded: '2015',
-    founder: 'Vitalik Buterin',
-    website: 'https://ethereum.org',
-    whitepaper: 'https://ethereum.org/whitepaper',
-    github: 'https://github.com/ethereum',
-    twitter: 'https://twitter.com/ethereum',
-    consensus: 'Proof of Stake (PoS)',
-    maxSupply: 'No max supply',
-    circulatingSupply: '~120 million ETH',
-    marketCap: '~$350 billion',
-    allTimeHigh: '$4,800',
-    allTimeLow: '$0.40',
-    useCases: ['Smart contracts', 'DeFi', 'NFTs', 'DAOs', 'Layer 2 solutions'],
-    features: ['Programmable', 'EVM compatible', 'Large ecosystem', 'Active development'],
-    strengths: ['First-mover in smart contracts', 'Largest developer ecosystem', 'Most dApps'],
-    weaknesses: ['High gas fees during congestion', 'Scalability challenges', 'Competition from L1s']
-  }
-}
 
-// Helper function to get crypto info with fallback
-function getCryptoInfo(symbol: string): CryptoInfo {
-  const defaultInfo: CryptoInfo = {
-    name: symbol,
-    fullName: `${symbol} (${symbol})`,
-    description: `${symbol} is a cryptocurrency trading on various exchanges.`,
-    longDescription: `${symbol} is a digital asset in the cryptocurrency market. More information will be updated soon.`,
-    founded: 'N/A',
+  // ============================================
+  // BNB (BNB Chain)
+  // ============================================
+  BNB: {
+    name: 'BNB',
+    fullName: 'BNB (BNB Chain)',
+    symbol: 'BNB',
+    description: 'BNB is the native cryptocurrency of the BNB Chain ecosystem, one of the largest blockchain networks.',
+    longDescription: 'BNB started as an ERC-20 token on Ethereum and later moved to its own blockchain, BNB Chain (formerly Binance Chain). It powers the entire BNB ecosystem including BSC (BNB Smart Chain), opBNB, and BNB Greenfield. BNB is used for transaction fees, staking, and governance.',
+    founded: '2017',
+    founder: 'Changpeng Zhao (CZ)',
+    website: 'https://bnbchain.org',
+    whitepaper: 'https://www.binance.com/resources/whitepaper',
+    github: 'https://github.com/bnb-chain',
+    twitter: 'https://twitter.com/BNBCHAIN',
+    discord: 'https://discord.gg/bnb-chain',
+    consensus: 'Proof of Staked Authority (PoSA)',
+    maxSupply: '200,000,000 BNB (deflationary via burns)',
+    circulatingSupply: '~153,000,000 BNB',
+    marketCap: '~$50,000,000,000',
+    allTimeHigh: '$1290',
+    allTimeLow: '$0.10',
+    useCases: [
+      'Transaction fees on BSC',
+      'Staking and governance',
+      'Exchange utility token',
+      'Gas fees for opBNB',
+      'Storage fees for Greenfield'
+    ],
+    features: [
+      'Fast and cheap transactions',
+      'EVM compatible',
+      'Regular token burns (deflationary)',
+      'Large ecosystem',
+      'Cross-chain compatibility'
+    ],
+    strengths: [
+      'Binance exchange backing',
+      'Large user base',
+      'Fast and low-cost transactions',
+      'Strong ecosystem of dApps',
+      'Regular token burns increase scarcity'
+    ],
+    weaknesses: [
+      'Centralization concerns',
+      'Regulatory scrutiny on Binance',
+      'Competition from Ethereum L2s'
+    ],
+    whyInvest: [
+      'Utility across BNB Chain ecosystem',
+      'Deflationary tokenomics via burns',
+      'Binance exchange integration',
+      'Growing L2 ecosystem (opBNB)',
+      'Real-world partnerships'
+    ],
+    futureOutlook: [
+      'opBNB Layer 2 scaling',
+      'BNB Greenfield data storage',
+      'Continued token burns',
+      'Increased decentralization',
+      'ZK-rollup integration'
+    ],
+    competitors: ['Ethereum', 'Solana', 'Polygon', 'Avalanche'],
+    roadmap: [
+      { year: '2017', event: 'BNB Token Launch (ERC-20)' },
+      { year: '2019', event: 'Binance Chain Launch' },
+      { year: '2021', event: 'BSC Launch & DeFi Boom' },
+      { year: '2022', event: 'First Quarterly Burn' },
+      { year: '2023', event: 'opBNB & Greenfield Launch' },
+      { year: '2024', event: 'BSC Ecosystem Expansion' }
+    ]
+  },
+
+  // ============================================
+  // XRP (Ripple)
+  // ============================================
+  XRP: {
+    name: 'XRP',
+    fullName: 'XRP (Ripple)',
+    symbol: 'XRP',
+    description: 'XRP is a digital payment protocol designed for fast, low-cost international settlements.',
+    longDescription: 'XRP is the native cryptocurrency of the XRP Ledger, created by Ripple Labs. It is designed for enterprise use cases, particularly cross-border payments and settlements. XRP transactions settle in 3-5 seconds with extremely low fees (<$0.01).',
+    founded: '2012',
+    founder: 'Chris Larsen, Jed McCaleb, David Schwartz',
+    website: 'https://ripple.com/xrp',
+    whitepaper: 'https://ripple.com/files/ripple_consensus_whitepaper.pdf',
+    github: 'https://github.com/ripple',
+    twitter: 'https://twitter.com/Ripple',
+    consensus: 'Federated Consensus (XRP Ledger)',
+    maxSupply: '100,000,000,000 XRP',
+    circulatingSupply: '~55,000,000,000 XRP',
+    marketCap: '~$30,000,000,000',
+    allTimeHigh: '$3.84',
+    allTimeLow: '$0.002',
+    useCases: [
+      'Cross-border payments',
+      'Bank settlements',
+      'Remittances',
+      'Liquidity provider',
+      'On-demand liquidity (ODL)'
+    ],
+    features: [
+      'Fast settlement (3-5 seconds)',
+      'Very low fees',
+      'Scalable (1,500+ TPS)',
+      'Energy efficient',
+      'Enterprise focus'
+    ],
+    strengths: [
+      'Banking and financial institution partnerships',
+      'Regulatory clarity (partial court victory)',
+      'Fast and cheap transactions',
+      'Large remittance corridor use'
+    ],
+    weaknesses: [
+      'Ongoing SEC lawsuit (partially resolved)',
+      'Centralization concerns',
+      'Limited DeFi ecosystem',
+      'Controlled by Ripple Labs'
+    ],
+    whyInvest: [
+      'Real-world banking partnerships',
+      'Cross-border payment solution',
+      'Regulatory progress',
+      'Utility for financial institutions',
+      'Large remittance market'
+    ],
+    futureOutlook: [
+      'SEC lawsuit resolution',
+      'US banking adoption',
+      'CBDC integration',
+      'Expansion into new markets',
+      'Tokenization of assets'
+    ],
+    competitors: ['Stellar (XLM)', 'SWIFT', 'Visa', 'Mastercard'],
+    roadmap: [
+      { year: '2012', event: 'XRP Ledger Launch' },
+      { year: '2013', event: 'Ripple Labs Founded' },
+      { year: '2017', event: 'XRP Market Cap Surge' },
+      { year: '2020', event: 'SEC Lawsuit Filed' },
+      { year: '2023', event: 'Partial Court Victory' },
+      { year: '2024', event: 'Ongoing Regulatory Progress' }
+    ]
+  },
+
+  // ============================================
+  // CARDANO (ADA)
+  // ============================================
+  ADA: {
+    name: 'Cardano',
+    fullName: 'Cardano (ADA)',
+    symbol: 'ADA',
+    description: 'Cardano is a proof-of-stake blockchain platform focused on sustainability, scalability, and peer-reviewed research.',
+    longDescription: 'Cardano is a decentralized blockchain platform built on peer-reviewed academic research. It uses the Ouroboros proof-of-stake consensus mechanism, which is energy-efficient and secure. Cardano focuses on smart contracts, dApps, and real-world use cases in finance, supply chain, and identity.',
+    founded: '2017',
+    founder: 'Charles Hoskinson (co-founder of Ethereum)',
+    website: 'https://cardano.org',
+    whitepaper: 'https://cardano.org/whitepaper',
+    github: 'https://github.com/input-output-hk/cardano-node',
+    twitter: 'https://twitter.com/Cardano',
+    discord: 'https://discord.gg/cardano',
+    consensus: 'Ouroboros Proof of Stake (PoS)',
+    maxSupply: '45,000,000,000 ADA',
+    circulatingSupply: '~35,000,000,000 ADA',
+    marketCap: '~$15,000,000,000',
+    allTimeHigh: '$3.09',
+    allTimeLow: '$0.02',
+    useCases: [
+      'Smart contracts',
+      'DeFi applications',
+      'Supply chain tracking',
+      'Digital identity (Atala PRISM)',
+      'Voting systems'
+    ],
+    features: [
+      'Peer-reviewed development',
+      'Energy-efficient PoS',
+      'Layered architecture',
+      'Formal verification',
+      'Treasury system'
+    ],
+    strengths: [
+      'Scientific, research-driven approach',
+      'Strong founder and team',
+      'Energy efficient',
+      'Growing ecosystem',
+      'Real-world partnerships in Africa'
+    ],
+    weaknesses: [
+      'Slow development pace',
+      'Smaller dApp ecosystem than Ethereum',
+      'Smart contracts came later than competitors'
+    ],
+    whyInvest: [
+      'Research-driven, secure approach',
+      'Sustainable and green blockchain',
+      'Real-world adoption in developing nations',
+      'Strong community support',
+      'Staking yields (3-5% APY)'
+    ],
+    futureOutlook: [
+      'Hydra scaling solution',
+      'Midnight privacy-focused sidechain',
+      'Increased DeFi adoption',
+      'More enterprise partnerships',
+      'Cross-chain interoperability'
+    ],
+    competitors: ['Ethereum', 'Solana', 'Avalanche', 'Polkadot'],
+    roadmap: [
+      { year: '2017', event: 'Cardano Mainnet Launch' },
+      { year: '2020', event: 'Shelley Upgrade (Decentralization)' },
+      { year: '2021', event: 'Alonzo Upgrade (Smart Contracts)' },
+      { year: '2022', event: 'Vasil Upgrade (Scalability)' },
+      { year: '2023', event: 'SECADA' },
+      { year: '2024', event: 'Hydra Rollout' }
+    ]
+  },
+
+  // ============================================
+  // GOLD (XAU)
+  // ============================================
+  GOLD: {
+    name: 'Gold',
+    fullName: 'Gold (XAU)',
+    symbol: 'GOLD',
+    description: 'Gold is a precious metal and historically the most important store of value for civilizations.',
+    longDescription: 'Gold has been used as money and a store of value for thousands of years. It is a physical commodity, not a cryptocurrency. In the digital age, gold-backed tokens (PAXG, XAUT) bring gold to the blockchain, offering the stability of gold with the convenience of crypto.',
+    founded: 'Ancient times (c. 3000 BC)',
+    founder: 'Unknown (discovered by ancient civilizations)',
+    website: 'https://www.gold.org',
+    consensus: 'Physical commodity',
+    maxSupply: '~244,000 metric tons mined (estimated)',
+    circulatingSupply: '~201,000 metric tons',
+    marketCap: '~$12,000,000,000,000',
+    allTimeHigh: '$5600',
+    allTimeLow: '$35 (1971)',
+    useCases: [
+      'Store of value',
+      'Hedge against inflation',
+      'Jewelry and decoration',
+      'Industrial applications (electronics, dentistry)',
+      'Central bank reserves',
+      'Investment portfolio diversification'
+    ],
+    features: [
+      'Physical tangible asset',
+      'Historically preserved value',
+      'Global liquidity',
+      'No counterparty risk',
+      'Inflation hedge'
+    ],
+    strengths: [
+      'Thousands of years as money',
+      'Global recognition',
+      'Central bank holdings',
+      'Limited supply growth',
+      'Safe-haven asset during crises'
+    ],
+    weaknesses: [
+      'Storage and security costs',
+      'No yield or dividends',
+      'Transportation difficulty',
+      'Price manipulation concerns',
+      'No utility beyond value storage'
+    ],
+    whyInvest: [
+      'Ultimate store of value',
+      'Portfolio diversification',
+      'Hedge against inflation and currency debasement',
+      'Safe-haven during economic uncertainty',
+      'Digital gold tokens offer crypto convenience'
+    ],
+    futureOutlook: [
+      'Central bank buying continues',
+      'Digital gold token adoption',
+      'Increased retail investment via ETFs',
+      'Potential as global reserve asset alongside USD',
+      'Gold-backed cryptocurrencies growth'
+    ],
+    competitors: ['Bitcoin (digital gold)', 'Silver', 'Treasury bonds', 'Real estate'],
+    roadmap: [
+      { year: '3000 BC', event: 'First Gold Use in Egypt' },
+      { year: '560 BC', event: 'First Gold Coins (Lydia)' },
+      { year: '1717', event: 'Gold Standard Begins (UK)' },
+      { year: '1971', event: 'US Leaves Gold Standard (Nixon Shock)' },
+      { year: '2004', event: 'First Gold ETF (GLD)' },
+      { year: '2019', event: 'Gold-Backed Tokens (PAXG, XAUT)' },
+      { year: '2024', event: 'Record High Prices' }
+    ]
+  },
+
+  // ============================================
+  // SILVER (XAG)
+  // ============================================
+  SILVER: {
+    name: 'Silver',
+    fullName: 'Silver (XAG)',
+    symbol: 'SILVER',
+    description: 'Silver is a precious metal with both investment value and extensive industrial applications.',
+    longDescription: 'Silver has been used as money and a store of value for millennia. Unlike gold, silver has significant industrial uses including electronics, solar panels, and medical applications. This dual demand (investment + industrial) creates unique market dynamics. Silver-backed tokens bring this metal to the blockchain.',
+    founded: 'Ancient times (c. 3000 BC)',
     founder: 'Unknown',
+    website: 'https://www.silverinstitute.org',
+    consensus: 'Physical commodity',
+    maxSupply: '~1.7 million metric tons estimated',
+    circulatingSupply: '~1.5 million metric tons',
+    marketCap: '~$1,300,000,000,000',
+    allTimeHigh: '$121.45 (1980, inflation-adjusted ~$180)',
+    allTimeLow: '$3.50 (2001)',
+    useCases: [
+      'Store of value',
+      'Industrial manufacturing',
+      'Solar panels (photovoltaic)',
+      'Electronics and circuitry',
+      'Medical applications',
+      'Jewelry and silverware',
+      'Photography'
+    ],
+    features: [
+      'Industrial + precious metal',
+      'More affordable than gold',
+      'Good conductor of electricity',
+      'Antibacterial properties',
+      'Highly malleable'
+    ],
+    strengths: [
+      'Industrial demand growth (solar, EVs)',
+      'More affordable entry point than gold',
+      'Historically recognized as money',
+      'Limited new mine supply',
+      'Dual demand drivers'
+    ],
+    weaknesses: [
+      'Industrial demand tied to economy',
+      'Price volatility higher than gold',
+      'Storage costs',
+      'Larger supply than gold'
+    ],
+    whyInvest: [
+      'Green energy transition (solar demand)',
+      'Electric vehicle manufacturing',
+      'Historical monetary metal',
+      'More leveraged than gold to industrial growth',
+      'Affordable precious metal entry'
+    ],
+    futureOutlook: [
+      'Solar panel demand growth',
+      'EV manufacturing needs',
+      '5G and electronics demand',
+      'Space exploration uses',
+      'Silver tokenization growth'
+    ],
+    competitors: ['Gold', 'Platinum', 'Palladium', 'Copper'],
+    roadmap: [
+      { year: '3000 BC', event: 'First Silver Use (Anatolia)' },
+      { year: '600 BC', event: 'First Silver Coins (Greek)' },
+      { year: '1870s', event: 'Silver Standard in Many Nations' },
+      { year: '1980', event: 'Hunt Brothers Attempted Corner' },
+      { year: '2020', event: 'Post-COVID Industrial Recovery' },
+      { year: '2025', event: 'Solar & EV Demand Surge' }
+    ]
+  },
+
+  // ============================================
+  // DEFAULT / FALLBACK
+  // ============================================
+  DEFAULT: {
+    name: 'Cryptocurrency',
+    fullName: 'Digital Asset',
+    description: 'A digital asset in the cryptocurrency market.',
+    longDescription: 'This cryptocurrency is traded on various exchanges. More information will be updated as it becomes available. The crypto market continues to evolve with new projects and innovations.',
+    founded: 'N/A',
+    founder: 'Various',
     website: '#',
     consensus: 'Various',
     maxSupply: 'Unknown',
@@ -214,25 +700,103 @@ function getCryptoInfo(symbol: string): CryptoInfo {
     marketCap: 'Unknown',
     allTimeHigh: 'Unknown',
     allTimeLow: 'Unknown',
-    useCases: ['Trading', 'Investment', 'Digital asset'],
-    features: ['Cryptocurrency', 'Digital asset', 'Blockchain-based']
+    useCases: ['Trading', 'Investment', 'Digital payments'],
+    features: ['Blockchain-based', 'Digital asset', 'Decentralized']
   }
-  return cryptoDatabase[symbol] || defaultInfo
 }
 
+// Helper function to get crypto info with fallback
+export function getCryptoInfo(symbol: string): CryptoInfo {
+  const upperSymbol = symbol.toUpperCase()
+  return cryptoDatabase[upperSymbol] || { ...cryptoDatabase.DEFAULT, name: symbol, fullName: `${symbol} (${symbol})` }
+}
+
+// Get all available symbols
+export function getAllCryptoSymbols(): string[] {
+  return Object.keys(cryptoDatabase).filter(key => key !== 'DEFAULT')
+}
+
+// Get all crypto info
+export function getAllCryptoInfo(): Record<string, CryptoInfo> {
+  return cryptoDatabase
+}
+
+// Search crypto by name or symbol
+export function searchCrypto(query: string): CryptoInfo[] {
+  const lowerQuery = query.toLowerCase()
+  return Object.values(cryptoDatabase)
+    .filter(crypto => 
+      crypto.name?.toLowerCase().includes(lowerQuery) ||
+      crypto.fullName?.toLowerCase().includes(lowerQuery) ||
+      crypto.symbol?.toLowerCase().includes(lowerQuery)
+    )
+    .filter(crypto => crypto.name !== 'Cryptocurrency') // Filter out default
+}
 // Live price fetching function
 async function getLivePrice(symbol: string): Promise<number> {
   try {
+    
+    // Handle Silver - Use Binance Futures API (working)
+
+ if (symbol === 'GOLD' || symbol === 'XAU') {
+      const response = await axios.get('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=XAUUSDT')
+      return parseFloat(response.data.lastPrice)
+    }
+    
+
+    if (symbol === 'SILVER' || symbol === 'XAG') {
+      const response = await axios.get('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=XAGUSDT')
+      return parseFloat(response.data.lastPrice)
+    }
+    
+    // Default: Crypto spot from Binance
     const response = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`)
     return parseFloat(response.data.price)
+    
   } catch (error) {
     console.error(`Error fetching ${symbol} price:`, error)
+    
+    // Return fallback prices
+    if (symbol === 'GOLD' || symbol === 'XAU') {
+      return 2334.50
+    }
+    if (symbol === 'SILVER' || symbol === 'XAG') {
+      return 27.50
+    }
+    
     throw new Error(`Could not fetch price for ${symbol}`)
   }
 }
 
 async function get24hrStats(symbol: string) {
   try {
+    // Handle Silver - Use Binance Futures API
+    if (symbol === 'SILVER' || symbol === 'XAG') {
+      const response = await axios.get('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=XAGUSDT')
+      return {
+        priceChange: parseFloat(response.data.priceChange),
+        priceChangePercent: parseFloat(response.data.priceChangePercent),
+        high24h: parseFloat(response.data.highPrice),
+        low24h: parseFloat(response.data.lowPrice),
+        volume: parseFloat(response.data.volume),
+        quoteVolume: parseFloat(response.data.quoteVolume)
+      }
+    }
+    
+    // Handle Gold - No futures data, return estimated values
+    if (symbol === 'GOLD' || symbol === 'XAU') {
+      const response = await axios.get('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=XAUUSDT')
+      return {
+        priceChange: parseFloat(response.data.priceChange),
+        priceChangePercent: parseFloat(response.data.priceChangePercent),
+        high24h: parseFloat(response.data.highPrice),
+        low24h: parseFloat(response.data.lowPrice),
+        volume: parseFloat(response.data.volume),
+        quoteVolume: parseFloat(response.data.quoteVolume)
+      }
+    }
+    
+    // Default: Crypto spot from Binance
     const response = await axios.get(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}USDT`)
     return {
       priceChange: parseFloat(response.data.priceChange),
