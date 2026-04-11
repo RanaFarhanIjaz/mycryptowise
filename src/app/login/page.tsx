@@ -35,6 +35,15 @@ export default function LoginPage() {
       if (error.code === 'auth/popup-blocked') {
         return 'Popup blocked. Allow popups and try again.'
       }
+      if (error.code === 'auth/unauthorized-domain') {
+        return 'This domain is not authorized in Firebase. Add it in Authentication -> Settings -> Authorized domains.'
+      }
+      if (error.code === 'auth/operation-not-allowed') {
+        return 'Google sign-in is not enabled in Firebase. Enable it in Authentication -> Sign-in method.'
+      }
+      if (error.code === 'auth/invalid-api-key') {
+        return 'Firebase API key is invalid. Check environment variables.'
+      }
       if (error.code === 'auth/network-request-failed') {
         return 'Network error. Check your internet and try again.'
       }

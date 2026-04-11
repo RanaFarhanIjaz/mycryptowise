@@ -309,7 +309,9 @@ export default function PredictionsPage() {
 
                       {data.prediction.data_source && (
                         <p className="text-xs sm:text-sm text-white/70 mt-3">
-                          Data: {data.prediction.data_source}
+                          {data.prediction.data_source.toUpperCase().includes('FALLBACK')
+                            ? 'Model is warming up. Showing a safe estimate.'
+                            : `Data: ${data.prediction.data_source}`}
                         </p>
                       )}
                     </div>
