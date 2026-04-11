@@ -24,13 +24,11 @@ RUN npm install
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python dependencies (with --break-system-packages flag)
+# Install Python dependencies
 RUN pip3 install --break-system-packages numpy pandas || pip3 install numpy pandas --user
 
 # Copy application
 COPY . .
-
-COPY .env.local ./.env.local
 
 # Build Next.js app
 RUN npm run build
