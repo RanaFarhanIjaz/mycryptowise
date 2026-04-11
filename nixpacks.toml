@@ -1,9 +1,9 @@
 [phases.setup]
-nixPkgs = ["python311", "nodejs-18_x"]
+nixPkgs = ["python311", "python311Packages.pip", "nodejs-18_x"]
 
 [phases.install]
 cmds = [
-  "pip install numpy pandas",
+  "python3 -m pip install numpy pandas",
   "npm install"
 ]
 
@@ -14,3 +14,6 @@ cmds = [
 
 [start]
 cmd = "npm start"
+
+[environment]
+PATH = "/root/.local/bin:${PATH}"
