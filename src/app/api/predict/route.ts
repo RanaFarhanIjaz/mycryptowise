@@ -6,9 +6,14 @@ import path from 'path'
 
 const execAsync = promisify(exec)
 
-// Function to try both python commands
+// Prioritize Python interpreters that include Nix-managed packages on Railway.
 async function runPythonScript(script: string, symbol: string, price: number, modelType: string) {
-  const pythonCommands = ['python3', 'python'];
+  const pythonCommands = [
+    '/root/.nix-profile/bin/python3',
+    '/nix/var/nix/profiles/default/bin/python3',
+    'python3',
+    'python'
+  ];
   let lastError: Error | null = null;
   
   for (const pythonCmd of pythonCommands) {
