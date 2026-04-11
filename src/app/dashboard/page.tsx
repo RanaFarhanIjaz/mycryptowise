@@ -11,7 +11,7 @@ import { auth } from '@/lib/firebase'
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [user, setUser] = useState<{ email: string } | null>(null)
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
 
   useEffect(() => {
@@ -20,7 +20,12 @@ export default function DashboardPage() {
         router.push('/login')
         setUser(null)
       } else {
-        setUser({ email: firebaseUser.email || firebaseUser.displayName || 'User' })
+        const email = firebaseUser.email || ''
+        const fallbackName = email ? email.split('@')[0] : 'User'
+        setUser({
+          name: firebaseUser.displayName || fallbackName,
+          email,
+        })
       }
       setAuthLoading(false)
     })
@@ -51,7 +56,7 @@ export default function DashboardPage() {
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Welcome, {user.email}!</CardTitle>
+            <CardTitle>Welcome, {user.name}!</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600 dark:text-gray-300">

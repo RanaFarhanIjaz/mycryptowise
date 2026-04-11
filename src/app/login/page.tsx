@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Sparkles, Mail, Lock } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { FirebaseError } from 'firebase/app'
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
 export default function LoginPage() {
@@ -16,6 +17,31 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+
+  const getLoginErrorMessage = (error: unknown) => {
+    if (error instanceof FirebaseError) {
+      if (error.code === 'auth/invalid-credential') {
+        return 'Invalid email or password.'
+      }
+      if (error.code === 'auth/user-not-found') {
+        return 'No account found for this email.'
+      }
+      if (error.code === 'auth/wrong-password') {
+        return 'Invalid email or password.'
+      }
+      if (error.code === 'auth/popup-closed-by-user') {
+        return 'Google sign-in was canceled.'
+      }
+      if (error.code === 'auth/popup-blocked') {
+        return 'Popup blocked. Allow popups and try again.'
+      }
+      if (error.code === 'auth/network-request-failed') {
+        return 'Network error. Check your internet and try again.'
+      }
+    }
+
+    return 'Sign in failed. Please try again.'
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,7 +52,22 @@ export default function LoginPage() {
       toast.success('Login successful!')
       router.push('/dashboard')
     } catch (error) {
-      toast.error('Invalid email or password')
+      toast.error(getLoginErrorMessage(error))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true)
+
+    try {
+      const provider = new GoogleAuthProvider()
+      await signInWithPopup(auth, provider)
+      toast.success('Signed in with Google!')
+      router.push('/dashboard')
+    } catch (error) {
+      toast.error(getLoginErrorMessage(error))
     } finally {
       setLoading(false)
     }
@@ -94,7 +135,8 @@ export default function LoginPage() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => {/* Google OAuth will be added later */}}
+            onClick={handleGoogleSignIn}
+            disabled={loading}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -114,7 +156,7 @@ export default function LoginPage() {
                 fill="#EA4335"
               />
             </svg>
-            Continue with Google
+            {loading ? 'Please wait...' : 'Continue with Google'}
           </Button>
 
           <p className="text-center mt-6 text-sm text-muted-foreground">
