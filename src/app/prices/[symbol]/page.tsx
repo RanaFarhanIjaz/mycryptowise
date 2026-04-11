@@ -706,23 +706,23 @@ const cryptoDatabase: Record<string, CryptoInfo> = {
 }
 
 // Helper function to get crypto info with fallback
-export function getCryptoInfo(symbol: string): CryptoInfo {
+function getCryptoInfo(symbol: string): CryptoInfo {
   const upperSymbol = symbol.toUpperCase()
   return cryptoDatabase[upperSymbol] || { ...cryptoDatabase.DEFAULT, name: symbol, fullName: `${symbol} (${symbol})` }
 }
 
 // Get all available symbols
-export function getAllCryptoSymbols(): string[] {
+function getAllCryptoSymbols(): string[] {
   return Object.keys(cryptoDatabase).filter(key => key !== 'DEFAULT')
 }
 
 // Get all crypto info
-export function getAllCryptoInfo(): Record<string, CryptoInfo> {
+function getAllCryptoInfo(): Record<string, CryptoInfo> {
   return cryptoDatabase
 }
 
 // Search crypto by name or symbol
-export function searchCrypto(query: string): CryptoInfo[] {
+function searchCrypto(query: string): CryptoInfo[] {
   const lowerQuery = query.toLowerCase()
   return Object.values(cryptoDatabase)
     .filter(crypto => 
