@@ -6,9 +6,10 @@ import path from 'path'
 
 const execAsync = promisify(exec)
 
-// Prioritize Python interpreters that include Nix-managed packages on Railway.
+// Prioritize the project virtualenv on Railway, then system fallbacks.
 async function runPythonScript(script: string, symbol: string, price: number, modelType: string) {
   const pythonCommands = [
+    path.join(process.cwd(), '.venv/bin/python'),
     '/root/.nix-profile/bin/python3',
     '/nix/var/nix/profiles/default/bin/python3',
     'python3',

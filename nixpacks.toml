@@ -1,9 +1,12 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.numpy", "python311Packages.pandas", "nodejs-18_x"]
+nixPkgs = ["python311", "nodejs-18_x"]
 
 [phases.install]
 cmds = [
-  "npm install"
+  "npm install",
+  "python3 -m venv .venv",
+  ".venv/bin/python -m pip install --upgrade pip",
+  ".venv/bin/python -m pip install numpy pandas"
 ]
 
 [phases.build]
