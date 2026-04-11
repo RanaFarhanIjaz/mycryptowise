@@ -95,6 +95,36 @@ function generatePriceAnalysis(symbol: string, price: number, changePercent: num
   return analysis
 }
 
+function buildFallbackResponse(userQuery: string, cryptoPrices: any, metalPrices: any, specificContext: string) {
+  if (specificContext) {
+    return `${specificContext} (AI provider temporarily unavailable, showing live rule-based analysis.)`
+  }
+
+  const topMoves = [
+    { symbol: 'BTC', data: cryptoPrices?.BTC },
+    { symbol: 'ETH', data: cryptoPrices?.ETH },
+    { symbol: 'SOL', data: cryptoPrices?.SOL }
+  ]
+    .filter((item) => item.data)
+    .sort((a, b) => Math.abs(b.data.changePercent) - Math.abs(a.data.changePercent))
+
+  const moveSummary = topMoves
+    .slice(0, 2)
+    .map((item) => `${item.symbol} ${item.data.changePercent > 0 ? '+' : ''}${item.data.changePercent.toFixed(2)}%`)
+    .join(', ')
+
+  const gold = metalPrices?.GOLD
+  const goldText = gold
+    ? `Gold ${gold.changePercent > 0 ? '+' : ''}${gold.changePercent.toFixed(2)}%`
+    : 'Gold data unavailable'
+
+  const queryHint = userQuery.includes('trend') || userQuery.includes('up') || userQuery.includes('down')
+    ? 'Tell me a coin (BTC/ETH/SOL/XRP) and I will give direction + next levels.'
+    : 'Ask about BTC, ETH, SOL, XRP, Gold, or Silver for direction and key levels.'
+
+  return `Market snapshot: ${moveSummary || 'No major moves'} | ${goldText}. ${queryHint} (AI provider temporarily unavailable, using live market fallback.)`
+}
+
 // ============================================
 // ASSISTANT API ROUTE
 // ============================================
@@ -187,19 +217,24 @@ You: "HamsterKombat to coin nahi lagta bhai! 😄 BTC, ETH ya SOL ke baare mein 
 
 Remember: Always give DIRECTION, not just numbers!`
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages.slice(-8)
-      ],
-      model: 'llama-3.3-70b-versatile',
-      temperature: 0.7,
-      max_tokens: 250
-    })
-    
-    const response = completion.choices[0]?.message?.content || ""
-    
-    return NextResponse.json({ response })
+    try {
+      const completion = await groq.chat.completions.create({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.slice(-8)
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 250
+      })
+
+      const response = completion.choices[0]?.message?.content || ''
+      return NextResponse.json({ response })
+    } catch (aiError) {
+      console.error('Assistant provider error, using fallback response:', aiError)
+      const response = buildFallbackResponse(userQuery, cryptoPrices, metalPrices, specificContext)
+      return NextResponse.json({ response })
+    }
     
   } catch (error) {
     console.error('API error:', error)
