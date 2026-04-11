@@ -2,11 +2,28 @@
 const nextConfig = {
   output: 'standalone',
   images: {
-    domains: ['localhost', 'cryptowise.vercel.app'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.up.railway.app',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cryptowise.vercel.app',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+      },
+    ],
   },
   env: {
-    GROQ_API_KEY: process.env.GROQ_API_KEY,
-    GOLD_API_KEY: process.env.GOLD_API_KEY,
+    GROQ_API_KEY: process.env.GROQ_API_KEY || '',
+    GOLD_API_KEY: process.env.GOLD_API_KEY || '',
   },
   // Allow external APIs
   async rewrites() {

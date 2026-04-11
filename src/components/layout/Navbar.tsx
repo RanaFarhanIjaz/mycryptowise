@@ -7,10 +7,14 @@ import { Menu, X, Sparkles, Home, LineChart, Bot, MessageSquare, Brain, DollarSi
 import { Button } from '@/components/ui/Button'
 import { useTheme } from 'next-themes'
 import { motion, AnimatePresence } from 'framer-motion'
+import { onAuthStateChanged, signOut, User } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authReady, setAuthReady] = useState(false)
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -23,6 +27,20 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setIsAuthenticated(Boolean(firebaseUser))
+      setAuthReady(true)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    await signOut(auth)
+    setIsOpen(false)
+  }
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -78,9 +96,20 @@ export default function Navbar() {
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </button>
               )}
-              <Button asChild size="sm" className="ml-2">
-                <Link href="/login">Login</Link>
-              </Button>
+              {mounted && authReady && (
+                isAuthenticated ? (
+                  <>
+                    <Button asChild size="sm" variant="outline" className="ml-2">
+                      <Link href="/dashboard">Dashboard</Link>
+                    </Button>
+                    <Button size="sm" className="ml-2" onClick={handleLogout}>Logout</Button>
+                  </>
+                ) : (
+                  <Button asChild size="sm" className="ml-2">
+                    <Link href="/login">Login</Link>
+                  </Button>
+                )
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -156,10 +185,19 @@ export default function Navbar() {
                     )
                   })}
                 </div>
-                <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-                  <Button asChild className="w-full touch-target">
-                    <Link href="/login">Login</Link>
-                  </Button>
+                <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+                  {authReady && isAuthenticated ? (
+                    <>
+                      <Button asChild className="w-full touch-target" variant="outline">
+                        <Link href="/dashboard" onClick={() => setIsOpen(false)}>Dashboard</Link>
+                      </Button>
+                      <Button className="w-full touch-target" onClick={handleLogout}>Logout</Button>
+                    </>
+                  ) : (
+                    <Button asChild className="w-full touch-target">
+                      <Link href="/login" onClick={() => setIsOpen(false)}>Login</Link>
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>

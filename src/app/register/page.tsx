@@ -8,6 +8,9 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Sparkles, Mail, Lock, User } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth'
+import { FirebaseError } from 'firebase/app'
+import { auth } from '@/lib/firebase'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -19,6 +22,31 @@ export default function RegisterPage() {
     confirmPassword: ''
   })
 
+  const getSignupErrorMessage = (error: unknown) => {
+    if (error instanceof FirebaseError) {
+      if (error.code === 'auth/weak-password') {
+        return 'Password must be at least 6 characters.'
+      }
+      if (error.code === 'auth/email-already-in-use') {
+        return 'This email is already registered. Please sign in.'
+      }
+      if (error.code === 'auth/invalid-email') {
+        return 'Please enter a valid email address.'
+      }
+      if (error.code === 'auth/network-request-failed') {
+        return 'Network error. Check your internet and try again.'
+      }
+      if (error.code === 'auth/popup-closed-by-user') {
+        return 'Google sign-up was canceled.'
+      }
+      if (error.code === 'auth/popup-blocked') {
+        return 'Popup blocked. Allow popups and try again.'
+      }
+    }
+
+    return 'Could not create account. Please try again.'
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -29,12 +57,31 @@ export default function RegisterPage() {
 
     setLoading(true)
 
-    // Simulate API call - Real logic will be added later
-    setTimeout(() => {
-      toast.success('Account created successfully! Please sign in.')
-      router.push('/login')
+    try {
+      const credentials = await createUserWithEmailAndPassword(auth, form.email, form.password)
+      await updateProfile(credentials.user, { displayName: form.name })
+      toast.success('Account created successfully!')
+      router.push('/dashboard')
+    } catch (error) {
+      toast.error(getSignupErrorMessage(error))
+    } finally {
       setLoading(false)
-    }, 800)
+    }
+  }
+
+  const handleGoogleSignUp = async () => {
+    setLoading(true)
+
+    try {
+      const provider = new GoogleAuthProvider()
+      await signInWithPopup(auth, provider)
+      toast.success('Signed in with Google!')
+      router.push('/dashboard')
+    } catch (error) {
+      toast.error(getSignupErrorMessage(error))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -121,7 +168,8 @@ export default function RegisterPage() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => {/* Google OAuth will be added later */}}
+            onClick={handleGoogleSignUp}
+            disabled={loading}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -141,7 +189,7 @@ export default function RegisterPage() {
                 fill="#EA4335"
               />
             </svg>
-            Continue with Google
+            {loading ? 'Please wait...' : 'Continue with Google'}
           </Button>
 
           <p className="text-center mt-6 text-sm text-muted-foreground">

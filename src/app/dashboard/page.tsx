@@ -6,29 +6,39 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Sparkles, LogOut, DollarSign, Brain, Bot, GraduationCap, ArrowRight } from 'lucide-react'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [user, setUser] = useState<{email: string} | null>(null)
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn')
-    const email = localStorage.getItem('userEmail')
-    
-    if (!isLoggedIn) {
-      router.push('/login')
-    } else {
-      setUser({ email: email || 'User' })
-    }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (!firebaseUser) {
+        router.push('/login')
+        setUser(null)
+      } else {
+        const email = firebaseUser.email || ''
+        const fallbackName = email ? email.split('@')[0] : 'User'
+        setUser({
+          name: firebaseUser.displayName || fallbackName,
+          email,
+        })
+      }
+      setAuthLoading(false)
+    })
+
+    return () => unsubscribe()
   }, [router])
 
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn')
-    localStorage.removeItem('userEmail')
+  const handleLogout = async () => {
+    await signOut(auth)
     router.push('/login')
   }
 
-  if (!user) return null
+  if (authLoading || !user) return null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -46,7 +56,7 @@ export default function DashboardPage() {
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Welcome, {user.email}!</CardTitle>
+            <CardTitle>Welcome, {user.name}!</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600 dark:text-gray-300">
