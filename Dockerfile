@@ -30,6 +30,8 @@ RUN pip3 install --break-system-packages numpy pandas || pip3 install numpy pand
 # Copy application
 COPY . .
 
+COPY .env.local ./.env.local
+
 # Build Next.js app
 RUN npm run build
 
