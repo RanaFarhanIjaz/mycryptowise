@@ -20,8 +20,11 @@ async function runPythonScript(script: string, symbol: string, price: number, mo
   for (const pythonCmd of pythonCommands) {
     try {
       console.log(`Trying with: ${pythonCmd}`);
+      const commandPrefix = pythonCmd.includes('/.venv/bin/python')
+        ? 'LD_LIBRARY_PATH=/root/.nix-profile/lib:/nix/var/nix/profiles/default/lib:$LD_LIBRARY_PATH '
+        : '';
       const { stdout, stderr } = await execAsync(
-        `${pythonCmd} "${script}" --symbol ${symbol} --price ${price} --model ${modelType}`,
+        `${commandPrefix}${pythonCmd} "${script}" --symbol ${symbol} --price ${price} --model ${modelType}`,
         { timeout: 30000 }
       );
       
