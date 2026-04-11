@@ -1,9 +1,9 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Send, Bot, User, Sparkles, TrendingUp, AlertTriangle, Zap, Brain, LineChart } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/Button'  // Capital B
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 
@@ -13,12 +13,19 @@ interface Message {
   insights?: string[]
 }
 
-// ✅ Make sure this is the ONLY default export
 export default function AssistantPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: `👋 Welcome to CryptoWise AI Assistant!\n\nI can help you with:\n• 📊 Real-time prices for crypto & metals\n• 🤖 AI-based predictions (94% accuracy)\n• 🚀 Ready-to-deploy trading bots\n• ⚠️ Risk analysis and trading strategies\n\nWhat would you like to know?`
+      content: `Welcome to CryptoWise AI Assistant!
+
+I can help you with:
+- Real-time prices for crypto & metals
+- AI-based predictions (94% accuracy)
+- Ready-to-deploy trading bots
+- Risk analysis and trading strategies
+
+What would you like to know?`
     }
   ])
   const [input, setInput] = useState('')
@@ -215,7 +222,7 @@ export default function AssistantPage() {
                 </div>
                 <div className="flex items-center gap-2 text-yellow-200">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>⚠️ Trade at own risk</span>
+                  <span>Trade at own risk</span>
                 </div>
               </div>
             </Card>

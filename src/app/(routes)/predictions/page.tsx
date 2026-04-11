@@ -24,16 +24,20 @@ interface PredictionData {
     source: string
   }
   prediction: {
-    current_price: number
-    predicted_price: number
-    predicted_change: number
+    price: number           // Changed from predicted_price
+    change: number          // Changed from predicted_change
     confidence: number
     direction: string
     model: string
-    data_source?: string
+    modelAccuracy: number  // Added
+    data_source: string
   }
   support: number
   resistance: number
+  technicals: {
+    rsi: number
+    macd: number
+  }
 }
 
 const models = {
@@ -51,7 +55,7 @@ export default function PredictionsPage() {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
-  const symbols = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP']
+  const symbols = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'GOLD', 'SILVER']
 
   const fetchPrediction = async () => {
     if (!selectedSymbol) {
@@ -140,7 +144,7 @@ export default function PredictionsPage() {
           </p>
         </motion.div>
 
-        {/* Controls - Mobile Responsive Grid */}
+        {/* Controls */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -198,7 +202,7 @@ export default function PredictionsPage() {
           </Card>
         </motion.div>
 
-        {/* Model Info Card - Mobile Responsive */}
+        {/* Model Info Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -279,7 +283,7 @@ export default function PredictionsPage() {
                     </div>
                   </div>
 
-                  {/* Prediction */}
+                  {/* Prediction - Updated to match API response */}
                   {data.prediction && (
                     <div className={`bg-gradient-to-r ${currentModel.color} p-4 sm:p-5 md:p-6 rounded-xl text-white`}>
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3 sm:mb-4">
@@ -293,17 +297,17 @@ export default function PredictionsPage() {
                       
                       <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                         <p className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                          ${formatPrice(data.prediction.predicted_price)}
+                          ${formatPrice(data.prediction.price)}
                         </p>
                         <div className={`flex items-center px-2 sm:px-3 py-1 rounded-full text-sm ${
-                          data.prediction.predicted_change > 0
+                          data.prediction.change > 0
                             ? 'bg-green-500/30 text-green-100'
-                            : data.prediction.predicted_change < 0
+                            : data.prediction.change < 0
                             ? 'bg-red-500/30 text-red-100'
                             : 'bg-gray-500/30 text-gray-100'
                         }`}>
-                          {data.prediction.predicted_change > 0 ? '↑' : '↓'}
-                          {Math.abs(data.prediction.predicted_change).toFixed(2)}%
+                          {data.prediction.change > 0 ? '↑' : '↓'}
+                          {Math.abs(data.prediction.change).toFixed(2)}%
                         </div>
                       </div>
 
@@ -321,7 +325,7 @@ export default function PredictionsPage() {
                       <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-1">Support Level</p>
                       <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
                         ${formatPrice(data.support)}
-                      </p>
+                      </p>s
                     </div>
                     <div className="p-3 sm:p-4 border border-red-200 dark:border-red-900 rounded-lg">
                       <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 mb-1">Resistance Level</p>
