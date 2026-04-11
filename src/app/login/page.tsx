@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Sparkles, Mail, Lock } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -19,18 +21,15 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
 
-    // Simulate API call - Real logic will be added later
-    setTimeout(() => {
-      if (email && password) {
-        localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('userEmail', email)
-        toast.success('Login successful!')
-        router.push('/dashboard')
-      } else {
-        toast.error('Invalid email or password')
-      }
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+      toast.success('Login successful!')
+      router.push('/dashboard')
+    } catch (error) {
+      toast.error('Invalid email or password')
+    } finally {
       setLoading(false)
-    }, 800)
+    }
   }
 
   return (

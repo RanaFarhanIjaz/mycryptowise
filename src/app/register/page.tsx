@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Sparkles, Mail, Lock, User } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -29,12 +31,16 @@ export default function RegisterPage() {
 
     setLoading(true)
 
-    // Simulate API call - Real logic will be added later
-    setTimeout(() => {
-      toast.success('Account created successfully! Please sign in.')
-      router.push('/login')
+    try {
+      const credentials = await createUserWithEmailAndPassword(auth, form.email, form.password)
+      await updateProfile(credentials.user, { displayName: form.name })
+      toast.success('Account created successfully!')
+      router.push('/dashboard')
+    } catch (error) {
+      toast.error('Could not create account. Try a different email.')
+    } finally {
       setLoading(false)
-    }, 800)
+    }
   }
 
   return (
