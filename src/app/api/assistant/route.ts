@@ -130,7 +130,21 @@ function buildFallbackResponse(userQuery: string, cryptoPrices: any, metalPrices
 // ============================================
 export async function POST(request: Request) {
   try {
-    const { messages } = await request.json()
+    const body = await request.json()
+    const inputMessages = Array.isArray(body?.messages) ? body.messages : []
+    const singleMessage = typeof body?.message === 'string' ? body.message : ''
+    const messages = inputMessages.length > 0
+      ? inputMessages
+      : singleMessage
+        ? [{ role: 'user', content: singleMessage }]
+        : []
+
+    if (messages.length === 0) {
+      return NextResponse.json(
+        { error: 'Message is required' },
+        { status: 400 }
+      )
+    }
     
     // Fetch REAL prices
     const [cryptoPrices, metalPrices] = await Promise.all([
