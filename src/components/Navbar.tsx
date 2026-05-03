@@ -3,13 +3,15 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, X, Home, DollarSign, LineChart, Bot, MessageCircle, GraduationCap, Info, LogIn, Zap, Sun, Moon } from 'lucide-react'
+import { Menu, X, Home, DollarSign, LineChart, Bot, MessageCircle, GraduationCap, Info, LogIn, Zap, Sun, Moon, History, PieChart } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useTheme } from 'next-themes'
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
+  { href: '/portfolio', label: 'Portfolio', icon: PieChart },
   { href: '/prices', label: 'Prices', icon: DollarSign },
+  { href: '/transactions', label: 'Transactions', icon: History },
   { href: '/prediction', label: 'Predictions', icon: LineChart },
   { href: '/bots', label: 'Bots', icon: Bot },
   { href: '/assistant', label: 'Assistant', icon: MessageCircle },

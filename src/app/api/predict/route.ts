@@ -10,6 +10,15 @@ async function runPythonScript(script: string, symbol: string, price: number, mo
   const pythonCommands = ['python3', 'python'];
   let lastError: Error | null = null;
   
+  // Map model types to their stderr filter patterns
+  const stderrFilters: Record<string, string> = {
+    transformer: 'Transformer Predictor',
+    ensemble: 'Ensemble Predictor',
+    lstm: 'LSTM Predictor',
+    xgboost: 'XGBoost Predictor'
+  };
+  const filterPattern = stderrFilters[modelType] || 'Predictor';
+  
   for (const pythonCmd of pythonCommands) {
     try {
       console.log(`Trying with: ${pythonCmd}`);
@@ -18,7 +27,7 @@ async function runPythonScript(script: string, symbol: string, price: number, mo
         { timeout: 30000 }
       );
       
-      if (stderr && !stderr.includes('Universal ML Predictor')) {
+      if (stderr && !stderr.includes(filterPattern)) {
         console.log(`⚠️ Stderr from ${pythonCmd}: ${stderr.substring(0, 200)}`);
       }
       
@@ -51,6 +60,14 @@ const modelConfigs = {
   ensemble: { name: 'Ensemble', accuracy: 94.5 },
   lstm: { name: 'LSTM', accuracy: 91.2 },
   xgboost: { name: 'XGBoost', accuracy: 89.5 }
+};
+
+// Map model types to their corresponding predict files
+const modelScripts: Record<string, string> = {
+  transformer: 'predict_transformer.py',
+  ensemble: 'predict_ensemble.py',
+  lstm: 'predict_lstm.py',
+  xgboost: 'predict_xgb.py'
 };
 
 export async function POST(request: Request) {
@@ -86,7 +103,10 @@ export async function POST(request: Request) {
     
     const technicals = calculateTechnicalIndicators(currentPrice);
     const modelConfig = modelConfigs[modelType as keyof typeof modelConfigs] || modelConfigs.ensemble;
-    const script = path.join(process.cwd(), 'src/lib/ml/predict_universal.py')
+    
+    // Select the appropriate predict script based on model type
+    const modelScriptFile = modelScripts[modelType] || 'predict_ensemble.py';
+    const script = path.join(process.cwd(), 'src/lib/ml', modelScriptFile)
     
     try {
       const { stdout } = await runPythonScript(script, symbol, currentPrice, modelType)
