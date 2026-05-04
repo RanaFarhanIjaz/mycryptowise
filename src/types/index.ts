@@ -46,7 +46,7 @@ export interface LoginAttempt {
 export interface Transaction {
   id: string
   userId: string
-  type: 'BUY' | 'SELL' | 'BOT'
+  type: 'BUY' | 'SELL' | 'BOT' | 'DEPOSIT' | 'WITHDRAW'
   asset: string
   quantity: number
   price: number
@@ -58,7 +58,7 @@ export interface Transaction {
 }
 
 export interface TransactionFilters {
-  type?: 'BUY' | 'SELL' | 'BOT'
+  type?: 'BUY' | 'SELL' | 'BOT' | 'DEPOSIT' | 'WITHDRAW'
   asset?: string
   startDate?: Date
   endDate?: Date

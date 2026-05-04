@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, X, Home, DollarSign, LineChart, Bot, MessageCircle, GraduationCap, Info, LogIn, Zap, Sun, Moon, History, PieChart } from 'lucide-react'
+import { Menu, X, Home, DollarSign, LineChart, Bot, MessageCircle, GraduationCap, Info, LogIn, Zap, Sun, Moon, History, PieChart, User, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useTheme } from 'next-themes'
+import { useAuth } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
@@ -22,8 +24,20 @@ const navItems = [
 
 export function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, setTheme } = useTheme()
+  const { user, logout } = useAuth()
+
+  const handleLogout = async () => {
+    await logout()
+    router.push('/login')
+  }
+
+  const filteredNavItems = navItems.filter(item => {
+    if (item.href === '/login' && user) return false
+    return true
+  })
 
   return (
     <>
@@ -39,7 +53,7 @@ export function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => {
+              {filteredNavItems.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
                 return (
@@ -59,6 +73,25 @@ export function Navbar() {
                   </Link>
                 )
               })}
+              {user && (
+                <div className="flex items-center gap-1 ml-2">
+                  <Link
+                    href="/profile"
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      pathname === '/profile' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Profile
+                    </span>
+                  </Link>
+                  <Button variant="ghost" size="sm" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Right side buttons */}
@@ -90,7 +123,7 @@ export function Navbar() {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 top-16 z-40 bg-background md:hidden overflow-y-auto">
           <div className="flex flex-col p-4 gap-2">
-            {navItems.map((item) => {
+            {filteredNavItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
               return (
@@ -109,6 +142,30 @@ export function Navbar() {
                 </Link>
               )
             })}
+            {user && (
+              <>
+                <Link
+                  href="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                    pathname === '/profile' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  }`}
+                >
+                  <User className="h-5 w-5" />
+                  <span>Profile</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-muted text-left"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span>Logout</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

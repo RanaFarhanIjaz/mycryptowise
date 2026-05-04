@@ -13,90 +13,63 @@ import {
   Filter,
   TrendingUp,
   TrendingDown,
+  Plus,
+  Minus,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Input } from '@/components/ui/Input'
 import { Transaction, TransactionFilters } from '@/types'
+import { Trash2 } from 'lucide-react'
 
 interface TransactionHistoryProps {
   transactions?: Transaction[]
   onExport?: () => void
+  onDelete?: (id: string) => void
   isLoading?: boolean
 }
 
 type SortField = 'date' | 'amount' | 'type'
 type SortDirection = 'asc' | 'desc'
 
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    userId: 'user-1',
-    type: 'BUY',
-    asset: 'BTC',
-    quantity: 0.5,
-    price: 45000,
-    totalValue: 22500,
-    date: new Date('2024-05-01'),
-    time: '14:30',
-    status: 'completed',
-  },
-  {
-    id: '2',
-    userId: 'user-1',
-    type: 'SELL',
-    asset: 'ETH',
-    quantity: 2.0,
-    price: 2500,
-    totalValue: 5000,
-    date: new Date('2024-04-30'),
-    time: '11:15',
-    status: 'completed',
-  },
-  {
-    id: '3',
-    userId: 'user-1',
-    type: 'BOT',
-    asset: 'XRP',
-    quantity: 100,
-    price: 0.52,
-    totalValue: 52,
-    date: new Date('2024-04-29'),
-    time: '09:45',
-    status: 'completed',
-    botId: 'bot-1',
-  },
-  {
-    id: '4',
-    userId: 'user-1',
-    type: 'BUY',
-    asset: 'ADA',
-    quantity: 500,
-    price: 0.98,
-    totalValue: 490,
-    date: new Date('2024-04-28'),
-    time: '16:20',
-    status: 'completed',
-  },
-  {
-    id: '5',
-    userId: 'user-1',
-    type: 'BOT',
-    asset: 'SOL',
-    quantity: 5,
-    price: 140,
-    totalValue: 700,
-    date: new Date('2024-04-27'),
-    time: '13:00',
-    status: 'completed',
-    botId: 'bot-2',
-  },
-]
+const SortableHeader = ({
+  field,
+  label,
+  sortField,
+  sortDirection,
+  handleSort,
+}: {
+  field: SortField
+  label: string
+  sortField: SortField
+  sortDirection: SortDirection
+  handleSort: (field: SortField) => void
+}) => {
+  return (
+    <button
+      onClick={() => handleSort(field)}
+      className="flex items-center gap-1 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+    >
+      {label}
+      {sortField === field && (
+        <span>
+          {sortDirection === 'asc' ? (
+            <ChevronUp className="w-4 h-4" />
+          ) : (
+            <ChevronDown className="w-4 h-4" />
+          )}
+        </span>
+      )}
+    </button>
+  )
+}
+
 
 export function TransactionHistory({
-  transactions = mockTransactions,
+  transactions = [],
   onExport,
+  onDelete,
   isLoading = false,
 }: TransactionHistoryProps) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -157,54 +130,31 @@ export function TransactionHistory({
 
   const getTransactionIcon = (type: Transaction['type']) => {
     switch (type) {
-      case 'BUY':
-        return <ArrowDownLeft className="w-5 h-5 text-green-500" />
-      case 'SELL':
-        return <ArrowUpRight className="w-5 h-5 text-red-500" />
-      case 'BOT':
-        return <Bot className="w-5 h-5 text-blue-500" />
+      case 'BUY':     return <ArrowDownLeft className="w-5 h-5 text-green-500" />
+      case 'SELL':    return <ArrowUpRight className="w-5 h-5 text-red-500" />
+      case 'BOT':     return <Bot className="w-5 h-5 text-blue-500" />
+      case 'DEPOSIT': return <Plus className="w-5 h-5 text-cyan-500" />
+      case 'WITHDRAW':return <Minus className="w-5 h-5 text-orange-500" />
+      default:        return null
     }
   }
 
   const getTypeColor = (type: Transaction['type']): string => {
     switch (type) {
-      case 'BUY':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
-      case 'SELL':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
-      case 'BOT':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
+      case 'BUY':     return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+      case 'SELL':    return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+      case 'BOT':     return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
+      case 'DEPOSIT': return 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-200'
+      case 'WITHDRAW':return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200'
+      default:        return 'bg-gray-100 text-gray-800'
     }
   }
 
-  const SortableHeader = ({
-    field,
-    label,
-  }: {
-    field: SortField
-    label: string
-  }) => (
-    <button
-      onClick={() => handleSort(field)}
-      className="flex items-center gap-1 font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-    >
-      {label}
-      {sortField === field && (
-        <span>
-          {sortDirection === 'asc' ? (
-            <ChevronUp className="w-4 h-4" />
-          ) : (
-            <ChevronDown className="w-4 h-4" />
-          )}
-        </span>
-      )}
-    </button>
-  )
-
-  const totalValue = filteredAndSortedTransactions.reduce((sum, t) => sum + t.totalValue, 0)
-  const buyCount = filteredAndSortedTransactions.filter(t => t.type === 'BUY').length
-  const sellCount = filteredAndSortedTransactions.filter(t => t.type === 'SELL').length
-  const botCount = filteredAndSortedTransactions.filter(t => t.type === 'BOT').length
+  const totalValue = filteredAndSortedTransactions.reduce((sum, t) => sum + t.totalValue, 0);
+  const buyCount     = filteredAndSortedTransactions.filter(t => t.type === 'BUY').length;
+  const sellCount    = filteredAndSortedTransactions.filter(t => t.type === 'SELL').length;
+  const depositCount = filteredAndSortedTransactions.filter(t => t.type === 'DEPOSIT').length;
+  const withdrawCount= filteredAndSortedTransactions.filter(t => t.type === 'WITHDRAW').length;
 
   return (
     <div className="w-full space-y-6">
@@ -263,19 +213,28 @@ export function TransactionHistory({
           </Card>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}>
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                  <Bot className="w-4 h-4 text-blue-500" />
-                  Bot Trades
+                  <Plus className="w-4 h-4 text-cyan-500" />
+                  Deposits
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{botCount}</p>
+                <p className="text-2xl font-bold text-cyan-600">{depositCount}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                  <Minus className="w-4 h-4 text-orange-500" />
+                  Withdrawals
+                </p>
+                <p className="text-2xl font-bold text-orange-600">{withdrawCount}</p>
               </div>
             </CardContent>
           </Card>
@@ -302,13 +261,21 @@ export function TransactionHistory({
               />
             </div>
 
-            <div className="flex gap-2">
-              {(['ALL', 'BUY', 'SELL', 'BOT'] as const).map(type => (
+            <div className="flex flex-wrap gap-2">
+              {(['ALL', 'BUY', 'SELL', 'DEPOSIT', 'WITHDRAW', 'BOT'] as const).map(type => (
                 <Button
                   key={type}
                   variant={typeFilter === type ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setTypeFilter(type)}
+                  className={
+                    typeFilter === type
+                      ? type === 'BUY' ? 'bg-green-600' :
+                        type === 'SELL' ? 'bg-red-600' :
+                        type === 'DEPOSIT' ? 'bg-cyan-600' :
+                        type === 'WITHDRAW' ? 'bg-orange-600' : ''
+                      : ''
+                  }
                 >
                   {type === 'ALL' ? 'All' : type}
                 </Button>
@@ -339,26 +306,39 @@ export function TransactionHistory({
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th className="px-4 py-3 text-left">
-                      <span className="font-semibold text-gray-700 dark:text-gray-300">Type</span>
+                      <SortableHeader 
+                        field="date" 
+                        label="Date & Time" 
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                        handleSort={handleSort}
+                      />
                     </th>
+                    <th className="px-4 py-3 text-left">Asset</th>
                     <th className="px-4 py-3 text-left">
-                      <span className="font-semibold text-gray-700 dark:text-gray-300">Asset</span>
+                      <SortableHeader 
+                        field="type" 
+                        label="Type" 
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                        handleSort={handleSort}
+                      />
                     </th>
-                    <th className="px-4 py-3 text-left">
-                      <SortableHeader field="date" label="Date/Time" />
-                    </th>
+                    <th className="px-4 py-3 text-right">Quantity</th>
+                    <th className="px-4 py-3 text-right">Price</th>
                     <th className="px-4 py-3 text-right">
-                      <span className="font-semibold text-gray-700 dark:text-gray-300">Quantity</span>
-                    </th>
-                    <th className="px-4 py-3 text-right">
-                      <span className="font-semibold text-gray-700 dark:text-gray-300">Price</span>
-                    </th>
-                    <th className="px-4 py-3 text-right">
-                      <SortableHeader field="amount" label="Total Value" />
+                      <SortableHeader 
+                        field="amount" 
+                        label="Total Value" 
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                        handleSort={handleSort}
+                      />
                     </th>
                     <th className="px-4 py-3 text-left">
                       <span className="font-semibold text-gray-700 dark:text-gray-300">Status</span>
                     </th>
+                    {onDelete && <th className="px-4 py-3 text-right"></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -419,6 +399,18 @@ export function TransactionHistory({
                           {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
                         </Badge>
                       </td>
+                      {onDelete && (
+                        <td className="px-4 py-3 text-right">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => onDelete(transaction.id)}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      )}
                     </motion.tr>
                   ))}
                 </tbody>

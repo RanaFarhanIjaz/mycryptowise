@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Live Price Service - Ultra Fast Real-time Prices
  * Fetches from Binance WebSocket and REST API
  */
@@ -13,6 +13,7 @@ let priceCache: Record<string, { price: number; timestamp: number }> = {}
 const CACHE_DURATION = 2000 // 2 seconds
 
 export async function getLivePrice(symbol: string): Promise<number> {
+  if (symbol === 'USD' || symbol === 'USDT') return 1.0;
   try {
     // Check cache first
     const cached = priceCache[symbol]

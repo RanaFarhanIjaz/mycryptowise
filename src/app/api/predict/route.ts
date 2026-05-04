@@ -3,11 +3,37 @@ import { getLivePrice } from '@/lib/api/live-prices'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 import path from 'path'
+import fs from 'fs'
 
 const execAsync = promisify(exec)
 
+function getPythonCandidates(): string[] {
+  const cwd = process.cwd()
+  const extra: string[] = []
+  
+  // Try environment variable first
+  const envPy = process.env.PYTHON_EXECUTABLE?.trim()
+  if (envPy) extra.push(envPy)
+
+  // Common virtual environment paths
+  const winVenv = path.join(cwd, 'python-env', 'Scripts', 'python.exe')
+  const unixVenv = path.join(cwd, 'python-env', 'bin', 'python')
+  const unixVenv3 = path.join(cwd, 'python-env', 'bin', 'python3')
+  const venv = path.join(cwd, 'venv', 'Scripts', 'python.exe')
+
+  if (fs.existsSync(winVenv)) extra.push(winVenv)
+  if (fs.existsSync(unixVenv)) extra.push(unixVenv)
+  if (fs.existsSync(unixVenv3)) extra.push(unixVenv3)
+  if (fs.existsSync(venv)) extra.push(venv)
+
+  // Standard commands
+  return [...extra, 'python', 'py', 'python3']
+}
+
 async function runPythonScript(script: string, symbol: string, price: number, modelType: string) {
-  const pythonCommands = ['python3', 'python'];
+  const pythonCommands = getPythonCandidates();
+  console.log(`🔍 Python candidates found: ${pythonCommands.length > 0 ? pythonCommands.join(', ') : 'None'}`);
+  
   let lastError: Error | null = null;
   
   // Map model types to their stderr filter patterns
@@ -22,25 +48,35 @@ async function runPythonScript(script: string, symbol: string, price: number, mo
   for (const pythonCmd of pythonCommands) {
     try {
       console.log(`Trying with: ${pythonCmd}`);
-      const { stdout, stderr } = await execAsync(
-        `${pythonCmd} "${script}" --symbol ${symbol} --price ${price} --model ${modelType}`,
-        { timeout: 30000 }
-      );
+      // Only pass --model if the script is the universal predict.py
+      const isUniversal = path.basename(script) === 'predict.py';
+      const modelArg = isUniversal ? `--model ${modelType}` : '';
+      const command = `"${pythonCmd}" "${script}" --symbol ${symbol} --price ${price} ${modelArg}`;
+      
+      const { stdout, stderr } = await execAsync(command, { timeout: 60000 });
       
       if (stderr && !stderr.includes(filterPattern)) {
-        console.log(`⚠️ Stderr from ${pythonCmd}: ${stderr.substring(0, 200)}`);
+        // Filter out common TF/OneDNN noise
+        const noise = stderr.includes('oneDNN') || stderr.includes('tensorflow') || stderr.includes('TF_ENABLE_ONEDNN');
+        if (!noise) {
+          console.log(`⚠️ Stderr from ${pythonCmd}: ${stderr.substring(0, 200)}`);
+        }
       }
       
       console.log(`✅ Success with: ${pythonCmd}`);
       return { stdout, stderr };
       
     } catch (error: any) {
-      console.log(`❌ Failed with ${pythonCmd}: ${error.message}`);
+      // Don't log full error if it's just "not found", but log if it's a script error
+      const isNotFound = error.message.includes('not found') || error.message.includes('not recognized') || error.message.includes('exit code 9009') || error.message.includes('Microsoft Store');
+      if (!isNotFound) {
+        console.log(`❌ Script error with ${pythonCmd}: ${error.message.substring(0, 250)}`);
+      }
       lastError = error;
     }
   }
   
-  throw lastError || new Error('No python command found');
+  throw lastError || new Error('No functional Python environment found');
 }
 
 function calculateTechnicalIndicators(price: number) {
@@ -104,12 +140,32 @@ export async function POST(request: Request) {
     const technicals = calculateTechnicalIndicators(currentPrice);
     const modelConfig = modelConfigs[modelType as keyof typeof modelConfigs] || modelConfigs.ensemble;
     
-    // Select the appropriate predict script based on model type
-    const modelScriptFile = modelScripts[modelType] || 'predict_ensemble.py';
-    const script = path.join(process.cwd(), 'src/lib/ml', modelScriptFile)
-    
+    // ---- STEP 1: Run Universal predict.py ----
+    const universalScript = path.join(process.cwd(), 'src/lib/ml', 'predict.py')
     try {
-      const { stdout } = await runPythonScript(script, symbol, currentPrice, modelType)
+      console.log('🔄 Running universal prediction step...')
+      await runPythonScript(universalScript, symbol, currentPrice, modelType)
+    } catch (universalErr: any) {
+      console.warn('⚠️ Universal prediction skipped or failed:', universalErr.message)
+    }
+
+    // ---- STEP 2: Run Symbol-Specific Prediction ----
+    // Check if btc.prediction.py (or eth.prediction.py, etc.) exists
+    const symbolScriptName = `${symbol.toLowerCase()}.prediction.py`
+    const symbolScriptPath = path.join(process.cwd(), 'src/lib/ml', symbolScriptName)
+    
+    // Select script: specific one if exists, otherwise the one mapped in modelScripts, 
+    // or fallback to predict_ensemble.py
+    let scriptToUse = symbolScriptPath
+    if (!fs.existsSync(symbolScriptPath)) {
+      console.log(`ℹ️ Specific script ${symbolScriptName} not found, falling back to model script.`)
+      const modelScriptFile = modelScripts[modelType] || 'predict_ensemble.py'
+      scriptToUse = path.join(process.cwd(), 'src/lib/ml', modelScriptFile)
+    }
+
+    try {
+      console.log(`🚀 Executing final prediction script: ${path.basename(scriptToUse)}`)
+      const { stdout } = await runPythonScript(scriptToUse, symbol, currentPrice, modelType)
       const result = JSON.parse(stdout)
       
       if (!result.success) {
