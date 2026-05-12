@@ -50,7 +50,7 @@ const teamMembers = [
     }
   },
   {
-    name: 'Hafiz Fahad',
+    name: 'M Fahad Idrees',
     role: 'Bot Trading Expert',
     expertise: 'Algorithmic Trading, Strategy Development',
     description: 'Expert in developing and deploying automated trading bots with proven track record.',
